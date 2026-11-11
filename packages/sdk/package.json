@@ -1,0 +1,35 @@
+{
+  "name": "@accountkit/sdk",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Read, verify, sign in with and operate House of Stake Top Level Accounts (TLAs) on NEAR.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:live": "LIVE=1 vitest run test/live.test.ts",
+    "example:resolve": "tsx examples/resolve.ts"
+  },
+  "dependencies": {
+    "@noble/curves": "2.0.1",
+    "@noble/hashes": "2.0.1",
+    "@scure/base": "2.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "24.9.1",
+    "tsx": "4.20.6",
+    "typescript": "5.9.3",
+    "vitest": "3.2.4"
+  }
+}

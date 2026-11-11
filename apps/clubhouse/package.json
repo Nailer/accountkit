@@ -1,0 +1,36 @@
+{
+  "name": "clubhouse",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Clubhouse: a members-only page gated by House of Stake Top Level Account ownership, built on @accountkit/sdk.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -k -n api,web \"tsx watch server/index.ts\" \"vite\"",
+    "server": "tsx server/index.ts",
+    "build": "vite build",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "echo \"(no app tests)\""
+  },
+  "dependencies": {
+    "@accountkit/sdk": "workspace:*",
+    "@near-wallet-selector/core": "10.1.4",
+    "@near-wallet-selector/meteor-wallet": "10.1.4",
+    "@near-wallet-selector/my-near-wallet": "10.1.4",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "near-api-js": "6.5.1",
+    "buffer": "6.0.3",
+    "near-api-js-v7": "npm:near-api-js@7.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "24.9.1",
+    "@types/react": "19.2.2",
+    "@types/react-dom": "19.2.2",
+    "@vitejs/plugin-react": "5.1.0",
+    "concurrently": "9.2.1",
+    "tsx": "4.20.6",
+    "typescript": "5.9.3",
+    "vite": "7.1.12"
+  }
+}

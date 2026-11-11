@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+vendor/tla-contracts/
+*.log
+.DS_Store
+deployment.*.json
+!deployment.example.json
