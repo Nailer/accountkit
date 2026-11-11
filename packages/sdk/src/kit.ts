@@ -30,7 +30,7 @@ export interface AccountKitConfig {
 
 export const DEFAULT_RPC: Record<string, string[]> = {
   mainnet: ["https://rpc.mainnet.fastnear.com", "https://rpc.mainnet.near.org"],
-  testnet: ["https://rpc.testnet.fastnear.com", "https://rpc.testnet.near.org"],
+  testnet: ["https://rpc.testnet.fastnear.com", "https://test.rpc.fastnear.com", "https://rpc.testnet.near.org"],
   sandbox: ["http://127.0.0.1:3030"],
 };
 
