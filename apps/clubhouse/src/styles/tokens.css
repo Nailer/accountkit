@@ -1,0 +1,85 @@
+/* AccountKit design tokens: ink & paper, with NEAR green as a signal. */
+:root {
+  /* ink (dark surfaces) */
+  --ink-950: #0b0a08;
+  --ink-900: #0f0e0b;
+  --ink-850: #151410;
+  --ink-800: #1b1a15;
+  --ink-700: #24221c;
+  --ink-line: #2e2b24;
+  --ink-line-2: #3d3930;
+  --on-ink: #f1ede4;
+  --on-ink-2: #c3bdb0;
+  --on-ink-3: #8f897c;
+
+  /* paper (light surfaces) */
+  --paper: #f3efe6;
+  --paper-2: #ebe6da;
+  --paper-3: #e2dccd;
+  --paper-line: #d6cfbf;
+  --on-paper: #17150f;
+  --on-paper-2: #4a463b;
+  --on-paper-3: #7a7466;
+
+  /* signals */
+  --signal: #00ec97;          /* NEAR green: primary actions, live, allowed */
+  --signal-hover: #45f3b3;
+  --signal-ink: #04170f;
+  --signal-deep: #00875a;     /* green text on paper (contrast) */
+  --signal-soft: rgba(0, 236, 151, 0.12);
+  --signal-line: rgba(0, 236, 151, 0.36);
+  --amber: #f3b443;           /* testnet */
+  --amber-soft: rgba(243, 180, 67, 0.12);
+  --amber-line: rgba(243, 180, 67, 0.4);
+  --coral: #ff6b57;           /* refused, blocked, errors */
+  --coral-deep: #c23a27;
+  --coral-soft: rgba(255, 107, 87, 0.12);
+  --coral-line: rgba(255, 107, 87, 0.42);
+
+  /* type */
+  --font-display: "Bricolage Grotesque", "Geist", ui-sans-serif, system-ui, sans-serif;
+  --font-ui: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  --text-xs: 12px;
+  --text-sm: 13.5px;
+  --text-base: 15.5px;
+  --text-md: 17px;
+  --text-lg: 19px;
+  --h3: 19px;
+  --h2: clamp(28px, 3.1vw, 42px);
+  --h1: clamp(38px, 4.9vw, 62px);
+
+  /* space (4px scale) */
+  --s1: 4px;
+  --s2: 8px;
+  --s3: 12px;
+  --s4: 16px;
+  --s5: 20px;
+  --s6: 24px;
+  --s7: 32px;
+  --s8: 40px;
+  --s9: 56px;
+  --s10: 72px;
+  --s11: 96px;
+  --s12: 128px;
+
+  --r-sm: 8px;
+  --r: 12px;
+  --r-lg: 18px;
+  --r-xl: 28px;
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+  --shadow-ink: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 24px 60px -30px rgba(0, 0, 0, 0.9);
+  --shadow-paper: 0 1px 0 rgba(255, 255, 255, 0.7) inset, 0 18px 40px -28px rgba(40, 32, 12, 0.45);
+  --focus-ring: 0 0 0 3px rgba(0, 236, 151, 0.55);
+
+  --container: 1200px;
+  --gutter: 20px;
+}
+
+@media (min-width: 760px) {
+  :root { --gutter: 32px; }
+}

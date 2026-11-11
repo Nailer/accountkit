@@ -58,6 +58,7 @@ export const api = {
     ),
   members: () => fetch("/api/members").then((r) => j<MembersResponse>(r)),
   logout: () => fetch("/api/logout", { method: "POST" }).then((r) => j<{ ok: boolean }>(r)),
+  demoStatus: () => demoStatus(),
 };
 
 export function formatNear(yocto: string): string {
@@ -108,3 +109,55 @@ export const agentApi = {
       j<AgentAttempt>(r),
     ),
 };
+
+/* ---------- live testnet run (server-signed demo accounts) ---------- */
+
+export interface DemoStatus {
+  ownership: boolean;
+  agent: boolean;
+  missing: string[];
+  running: string | null;
+  name: string;
+  people: [string, string];
+  agentAccount: string | null;
+  approved: string;
+  network: string;
+}
+
+export interface DemoEvent {
+  step: string;
+  status: "running" | "ok" | "refused" | "error";
+  title: string;
+  detail?: string;
+  tx?: string;
+  data?: Record<string, unknown>;
+  at: string;
+}
+
+export async function demoStatus(): Promise<DemoStatus> {
+  return j<DemoStatus>(await fetch("/api/demo/status"));
+}
+
+/** Starts a live run and calls onEvent for each step as the server streams it. */
+export async function runDemo(kind: "ownership" | "agent", onEvent: (e: DemoEvent) => void): Promise<void> {
+  const res = await fetch(`/api/demo/${kind}`, { method: "POST" });
+  if (!res.ok || !res.body) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.error ?? `HTTP ${res.status}`);
+  }
+  const reader = res.body.getReader();
+  const dec = new TextDecoder();
+  let buf = "";
+  for (;;) {
+    const { value, done } = await reader.read();
+    if (done) break;
+    buf += dec.decode(value, { stream: true });
+    let i;
+    while ((i = buf.indexOf("\n\n")) >= 0) {
+      const chunk = buf.slice(0, i);
+      buf = buf.slice(i + 2);
+      const line = chunk.split("\n").find((l) => l.startsWith("data: "));
+      if (line) onEvent(JSON.parse(line.slice(6)));
+    }
+  }
+}

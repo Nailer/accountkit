@@ -23,6 +23,7 @@ import {
   type TlaInfo,
 } from "@accountkit/sdk";
 import { DEMO_TASKS, attempt, propose, type TaskId } from "./agent.js";
+import { demoAvailability, runAgent, runOwnership, type DemoConfig, type DemoEvent } from "./demo.js";
 
 // Load apps/clubhouse/.env when present (Node 20.12+). Real env vars win.
 try {
@@ -44,6 +45,17 @@ const AGENT = process.env.AGENT_ACCOUNT?.trim() || null;
 const AGENT_APPROVED = process.env.AGENT_APPROVED?.trim() || "ak-shop.testnet";
 const AGENT_STRANGER = process.env.AGENT_STRANGER?.trim() || "akclub.testnet";
 const PORT = Number(process.env.PORT ?? 8787);
+// Live testnet run (server-signed test accounts). Available only where their keys exist.
+const DEMO: DemoConfig = {
+  network: NETWORK,
+  rpcUrl: process.env.RPC_URLS?.split(",")[0]?.trim() || "https://rpc.testnet.fastnear.com",
+  name: process.env.DEMO_NAME?.trim() || "alice-member.akclub.testnet",
+  people: [process.env.DEMO_A?.trim() || "ak-alice.testnet", process.env.DEMO_B?.trim() || "ak-bob.testnet"],
+  agent: AGENT,
+  approved: AGENT_APPROVED,
+  stranger: AGENT_STRANGER,
+};
+let demoRunning: string | null = null;
 const SECRET = randomBytes(32);
 const CHALLENGE_TTL_MS = 5 * 60_000;
 const SESSION_TTL_MS = 60 * 60_000;
@@ -237,6 +249,33 @@ async function route(req: IncomingMessage, res: ServerResponse) {
         "This check runs on every request. Transfer the NFT and the next request is refused.",
       ],
     });
+  }
+
+  /* ---------- live testnet run (server-signed demo accounts) ---------- */
+
+  if (req.method === "GET" && path === "/api/demo/status") {
+    const a = NETWORK === "mainnet" ? { ownership: false, agent: false, missing: [] } : demoAvailability(DEMO);
+    return send(res, 200, { ...a, running: demoRunning, name: DEMO.name, people: DEMO.people, agentAccount: DEMO.agent, approved: DEMO.approved, network: NETWORK });
+  }
+
+  if (req.method === "POST" && (path === "/api/demo/ownership" || path === "/api/demo/agent")) {
+    if (NETWORK === "mainnet") return send(res, 403, { error: "the live run is testnet-only" });
+    const a = demoAvailability(DEMO);
+    const which = path.endsWith("agent") ? "agent" : "ownership";
+    if (!(which === "agent" ? a.agent : a.ownership)) return send(res, 503, { error: "the demo accounts' testnet keys are not on this server", missing: a.missing });
+    if (demoRunning) return send(res, 409, { error: `a ${demoRunning} run is already in progress; wait for it to finish` });
+    demoRunning = which;
+    res.writeHead(200, { "content-type": "text/event-stream", "cache-control": "no-store", connection: "keep-alive" });
+    const emit = (e: DemoEvent) => res.write(`data: ${JSON.stringify({ ...e, at: new Date().toISOString() })}\n\n`);
+    try {
+      await (which === "agent" ? runAgent(kit, DEMO, emit) : runOwnership(kit, DEMO, emit));
+    } catch (e) {
+      emit({ step: "error", status: "error", title: "The run stopped", detail: (e as Error).message });
+    } finally {
+      demoRunning = null;
+      res.end();
+    }
+    return;
   }
 
   /* ---------- agent demo (stretch). Only for the signed-in current owner. ---------- */

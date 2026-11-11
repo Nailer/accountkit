@@ -123,11 +123,64 @@ export const PlusIcon = (p: SVGProps<SVGSVGElement>) => (
   </Svg>
 );
 
+export const MenuIcon = (p: SVGProps<SVGSVGElement>) => (
+  <Svg {...p}>
+    <path d="M4 7h16M4 12h16M4 17h10" />
+  </Svg>
+);
+
+export const CopyIcon = (p: SVGProps<SVGSVGElement>) => (
+  <Svg {...p} width="15" height="15">
+    <rect x="8" y="8" width="12" height="12" rx="2.5" />
+    <path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2" />
+  </Svg>
+);
+
+export const PlayIcon = (p: SVGProps<SVGSVGElement>) => (
+  <Svg {...p}>
+    <path d="M7 5.5v13a1 1 0 0 0 1.5.86l10.6-6.5a1 1 0 0 0 0-1.72L8.5 4.64A1 1 0 0 0 7 5.5z" />
+  </Svg>
+);
+
+export const CodeIcon = (p: SVGProps<SVGSVGElement>) => (
+  <Svg {...p}>
+    <path d="m8 7-5 5 5 5M16 7l5 5-5 5M13.5 4l-3 16" />
+  </Svg>
+);
+
+export const LayersIcon = (p: SVGProps<SVGSVGElement>) => (
+  <Svg {...p}>
+    <path d="m12 3 9 5-9 5-9-5 9-5zM3 13l9 5 9-5" />
+  </Svg>
+);
+
+export const SignatureIcon = (p: SVGProps<SVGSVGElement>) => (
+  <Svg {...p}>
+    <path d="M3 17c3 0 4-6 6-6s1 6 3 6 3-3 4-3 1.5 3 5 3M3 21h18" />
+  </Svg>
+);
+
+export const ClockIcon = (p: SVGProps<SVGSVGElement>) => (
+  <Svg {...p}>
+    <circle cx="12" cy="12" r="9" />
+    <path d="M12 7v5l3 2" />
+  </Svg>
+);
+
+/** AccountKit mark: a rounded account tile with a key notch. */
+export const KitMark = ({ size = 28 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+    <rect x="1.5" y="1.5" width="29" height="29" rx="9" fill="var(--signal)" />
+    <circle cx="13" cy="16" r="4.6" fill="none" stroke="var(--signal-ink)" strokeWidth="2.4" />
+    <path d="M17.4 16h8M22.5 16v3.4M25.4 16v2.4" stroke="var(--signal-ink)" strokeWidth="2.4" strokeLinecap="round" />
+  </svg>
+);
+
 /** The Clubhouse mark: a doorway inside a rounded square. */
 export const ClubMark = () => (
   <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" focusable="false">
-    <rect x="1" y="1" width="26" height="26" rx="8" fill="var(--accent)" />
-    <path d="M9 21V9.5a1.5 1.5 0 0 1 1.5-1.5h7a1.5 1.5 0 0 1 1.5 1.5V21" fill="none" stroke="var(--accent-ink)" strokeWidth="2" strokeLinecap="round" />
-    <circle cx="16" cy="15" r="1.1" fill="var(--accent-ink)" />
+    <rect x="1" y="1" width="26" height="26" rx="8" fill="var(--signal)" />
+    <path d="M9 21V9.5a1.5 1.5 0 0 1 1.5-1.5h7a1.5 1.5 0 0 1 1.5 1.5V21" fill="none" stroke="var(--signal-ink)" strokeWidth="2" strokeLinecap="round" />
+    <circle cx="16" cy="15" r="1.1" fill="var(--signal-ink)" />
   </svg>
 );

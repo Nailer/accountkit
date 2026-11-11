@@ -2,7 +2,7 @@ import { addExtensionTx, grantSpendTx, revokeSpendTx } from "@accountkit/sdk";
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { agentApi, formatNear, type AgentAttempt, type AgentInfo } from "./api";
 import { BotIcon, CheckIcon, ExternalIcon, PlusIcon, XIcon } from "./icons";
-import { Button, StatusPill } from "./ui";
+import { Button, Pill } from "./components/primitives";
 import { sendNear, signAndSend, signAndSendMany } from "./wallet";
 
 const YOCTO = 10n ** 24n;
@@ -58,7 +58,7 @@ export function AgentPanel(props: { network: string; tla: string; balanceYocto: 
   };
 
   return (
-    <section className="card agent-card" aria-labelledby="agent-title">
+    <section className="card agent-card theme-ink" aria-labelledby="agent-title">
       <div className="card-head">
         <div>
           <div className="eyebrow">Optional demo</div>
@@ -77,7 +77,7 @@ export function AgentPanel(props: { network: string; tla: string; balanceYocto: 
           <dl className="facts">
             <dt>Agent enabled</dt>
             <dd>
-              <StatusPill ok={info.status.extension_enabled}>{info.status.extension_enabled ? "Yes" : "No"}</StatusPill>
+              <Pill tone={info.status.extension_enabled ? "ok" : undefined}>{info.status.extension_enabled ? "Yes" : "No"}</Pill>
             </dd>
             <dt>Spending limit</dt>
             <dd>

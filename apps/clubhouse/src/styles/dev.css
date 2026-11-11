@@ -1,0 +1,31 @@
+/* ================================================================ DEVELOPERS */
+.dev-hero { padding: 140px 0 var(--s10); background: radial-gradient(800px 380px at 10% -10%, rgba(0, 236, 151, 0.07), transparent 70%), var(--ink-900); }
+.dev-hero-grid { display: grid; gap: var(--s8); align-items: center; }
+@media (min-width: 1020px) { .dev-hero-grid { grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); } }
+.dev-hero-grid > div:first-child { display: grid; gap: var(--s4); }
+.dev-hero h1 { font-size: clamp(32px, 3.8vw, 48px); line-height: 1.06; }
+.dev-status { display: flex; gap: var(--s2); flex-wrap: wrap; }
+.dev-section { padding: var(--s11) 0; }
+.dev-two { display: grid; gap: var(--s8); align-items: start; }
+@media (min-width: 980px) { .dev-two { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
+.dev-two > div { display: grid; gap: var(--s4); }
+.api-groups { display: grid; gap: var(--s5); margin-top: var(--s7); }
+@media (min-width: 1020px) { .api-groups { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.api-group h3 { margin-bottom: var(--s3); }
+.api-group ul { list-style: none; margin: 0; padding: 0; display: grid; }
+.api-group li { display: grid; gap: 4px; padding: 12px 0; border-top: 1px solid var(--line); }
+.api-group code { color: var(--signal); font-size: 13px; overflow-wrap: anywhere; }
+.api-group span { color: var(--fg-2); font-size: 14px; }
+.kv { margin: var(--s2) 0 0; display: grid; border-top: 1px solid var(--line); }
+.kv > div { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: var(--s4); align-items: center; padding: 12px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+.kv dt { color: var(--fg-3); }
+.kv dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+@media (max-width: 520px) { .kv > div { grid-template-columns: 1fr; gap: 4px; } }
+.copy-val { display: inline-flex; align-items: center; gap: 8px; max-width: 100%; padding: 6px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); cursor: pointer; font-size: 13px; text-align: left; overflow-wrap: anywhere; transition: border-color 0.2s; }
+.copy-val:hover { border-color: var(--fg-3); }
+.copy-val svg { flex: none; color: var(--fg-3); }
+.err-card { padding: var(--s2) var(--s5); }
+.err-card td { padding: 12px 0; border-top: 1px solid var(--line); font-size: 14px; vertical-align: top; color: var(--fg-2); }
+.err-card tr:first-child td { border-top: 0; }
+.err-card td:first-child { padding-right: var(--s4); white-space: nowrap; }
+.err-card code { color: var(--coral-deep); }

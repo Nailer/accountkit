@@ -1,7 +1,9 @@
 import { Buffer } from "buffer";
 import { setupWalletSelector, type Wallet, type WalletSelector } from "@near-wallet-selector/core";
 import { setupMeteorWallet } from "@near-wallet-selector/meteor-wallet";
-import { setupMyNearWallet } from "@near-wallet-selector/my-near-wallet";
+import { setupIntearWallet } from "@near-wallet-selector/intear-wallet";
+import { setupHereWallet } from "@near-wallet-selector/here-wallet";
+import { setupSender } from "@near-wallet-selector/sender";
 import type { WalletTransaction } from "@accountkit/sdk";
 
 // Browser wallets (MyNearWallet) call Buffer.from on the NEP-413 nonce.
@@ -12,14 +14,17 @@ let selectorPromise: Promise<WalletSelector> | null = null;
 export function getSelector(network: string): Promise<WalletSelector> {
   selectorPromise ??= setupWalletSelector({
     network: network as "mainnet" | "testnet",
-    modules: [setupMyNearWallet(), setupMeteorWallet()],
+    // MyNearWallet stopped accepting new app connections in 2026, so it is not offered.
+    modules: [setupMeteorWallet(), setupIntearWallet(), setupHereWallet(), setupSender()],
   });
   return selectorPromise;
 }
 
 export const WALLETS = [
-  { id: "my-near-wallet", label: "MyNearWallet" },
-  { id: "meteor-wallet", label: "Meteor Wallet" },
+  { id: "meteor-wallet", label: "Meteor Wallet", kind: "Web or extension" },
+  { id: "intear-wallet", label: "Intear Wallet", kind: "Web" },
+  { id: "here-wallet", label: "HERE Wallet", kind: "Mobile or web" },
+  { id: "sender", label: "Sender", kind: "Browser extension" },
 ] as const;
 
 export async function connect(network: string, walletId: string): Promise<string> {
