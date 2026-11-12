@@ -168,11 +168,17 @@ export const ClockIcon = (p: SVGProps<SVGSVGElement>) => (
 );
 
 /** AccountKit mark: a rounded account tile with a key notch. */
+/**
+ * The AccountKit mark: an account (rounded square) bound to a token (circle).
+ * The token overlaps the account's corner: the NFT and the account are one thing.
+ * Same geometry as brand/accountkit-mark.svg.
+ */
 export const KitMark = ({ size = 28 }: { size?: number }) => (
-  <svg width={size} height={size} viewBox="0 0 32 32" aria-hidden="true" focusable="false">
-    <rect x="1.5" y="1.5" width="29" height="29" rx="9" fill="var(--signal)" />
-    <circle cx="13" cy="16" r="4.6" fill="none" stroke="var(--signal-ink)" strokeWidth="2.4" />
-    <path d="M17.4 16h8M22.5 16v3.4M25.4 16v2.4" stroke="var(--signal-ink)" strokeWidth="2.4" strokeLinecap="round" />
+  <svg width={size} height={size} viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+    <rect x="0.75" y="0.75" width="62.5" height="62.5" rx="15" fill="var(--ink-800)" stroke="var(--ink-line-2)" strokeWidth="1.5" />
+    <rect x="13" y="21" width="30" height="30" rx="8.5" fill="none" stroke="var(--signal)" strokeWidth="5.5" />
+    <circle cx="43" cy="21" r="13.6" fill="var(--ink-800)" />
+    <circle cx="43" cy="21" r="10.4" fill="var(--signal)" />
   </svg>
 );
 

@@ -30,7 +30,9 @@ export function Nav({ network }: { network: string }) {
         <motion.div className="container nav-inner" initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}>
           <Link to="/" className="logo" aria-label="AccountKit home">
             <KitMark />
-            AccountKit
+            <span>
+              Account<span className="logo-kit">Kit</span>
+            </span>
             <span className="logo-sub">for NEAR</span>
           </Link>
           <nav className="nav-links" aria-label="Main">
@@ -86,7 +88,7 @@ export function Footer({ network, club }: { network: string; club: string | null
         <div className="footer-grid">
           <div className="footer-brand">
             <Link to="/" className="logo">
-              <KitMark /> AccountKit
+              <KitMark /> <span>Account<span className="logo-kit">Kit</span></span>
             </Link>
             <p>A TypeScript toolkit for House of Stake's Top Level Accounts on NEAR, with Clubhouse as its live demo. Built at NEAR HACKATHON, November 2026.</p>
           </div>
