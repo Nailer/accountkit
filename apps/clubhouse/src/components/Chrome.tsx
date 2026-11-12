@@ -82,6 +82,8 @@ export function Nav({ network }: { network: string }) {
   );
 }
 
+const REPO = "https://github.com/Nailer/accountkit";
+
 export function Footer({ network, club }: { network: string; club: string | null }) {
   return (
     <footer className="footer theme-ink">
@@ -115,6 +117,8 @@ export function Footer({ network, club }: { network: string; club: string | null
               <li><Link to="/developers">SDK reference</Link></li>
               <li><Link to="/developers#contracts">Network &amp; contracts</Link></li>
               <li><Link to="/developers#errors">Error codes</Link></li>
+              <li><a href={REPO} target="_blank" rel="noreferrer">Source on GitHub</a></li>
+              <li><a href={`${REPO}#readme`} target="_blank" rel="noreferrer">README and threat model</a></li>
             </ul>
           </div>
         </div>
@@ -123,7 +127,9 @@ export function Footer({ network, club }: { network: string; club: string | null
             {network === "testnet" ? "Runs on NEAR testnet. Test tokens only; they have no value." : `Network: ${network}`}
             {club ? ` · Demo club: ${club}` : ""}
           </span>
-          <span>Uses House of Stake's TLA contracts (unmodified). MIT licensed.</span>
+          <span>
+            Uses House of Stake's TLA contracts (unmodified). <a href={`${REPO}/blob/main/LICENSE`} target="_blank" rel="noreferrer">MIT licensed</a>.
+          </span>
         </div>
       </div>
     </footer>
