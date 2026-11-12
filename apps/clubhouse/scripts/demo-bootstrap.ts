@@ -23,7 +23,7 @@
  *                   read from FUNDER_CREDENTIALS_DIR (default ~/.near-credentials).
  */
 import { randomBytes } from "node:crypto";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -149,6 +149,11 @@ async function createAccount(accountId: string): Promise<void> {
 
 /** Sets KEY=value lines in the .env file, keeping every other line. */
 function writeEnv(values: Record<string, string>) {
+  // Keep the previous settings: switching back to the old demo accounts is a copy away.
+  if (existsSync(ENV_FILE)) {
+    copyFileSync(ENV_FILE, `${ENV_FILE}.bak`);
+    console.log(`  previous settings saved to ${ENV_FILE}.bak`);
+  }
   const source = existsSync(ENV_FILE) ? ENV_FILE : join(APP_DIR, ".env.example");
   const lines = existsSync(source) ? readFileSync(source, "utf8").split("\n") : [];
   const left = new Map(Object.entries(values));
