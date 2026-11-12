@@ -13,6 +13,7 @@
  *   PORT        default 8787
  *   HOST        interface to listen on (default 127.0.0.1: this machine only)
  *   ALLOWED_ORIGINS  extra browser origins allowed to POST, comma-separated
+ *   SESSION_SECRET   32+ characters; keeps sign-ins valid across restarts (default: random per process)
  */
 import { randomBytes } from "node:crypto";
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
@@ -67,7 +68,9 @@ let demoRunning: string | null = null;
 // Per-IP limits: sign-in endpoints and the live run, which spends the demo accounts' test NEAR.
 const signInLimit = rateLimiter(30, 60_000);
 const demoLimit = rateLimiter(6, 10 * 60_000);
-const SECRET = randomBytes(32);
+// SESSION_SECRET (32+ characters) keeps sessions valid across restarts; otherwise a fresh random secret per process.
+const SECRET = process.env.SESSION_SECRET && process.env.SESSION_SECRET.length >= 32 ? new TextEncoder().encode(process.env.SESSION_SECRET) : randomBytes(32);
+if (process.env.SESSION_SECRET && process.env.SESSION_SECRET.length < 32) console.warn("SESSION_SECRET is shorter than 32 characters; using a random secret instead");
 const CHALLENGE_TTL_MS = 5 * 60_000;
 const SESSION_TTL_MS = 60 * 60_000;
 
