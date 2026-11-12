@@ -55,7 +55,8 @@ The core ownership journey (read a TLA → verify it → owner signs in → tran
 - **The team approved a testnet deployment.** House of Stake's unmodified contracts are live under `akclub.testnet` (see `DEPLOYMENT.md`), funded only with faucet test NEAR.
 - **Core journey proven on testnet:** resolve → verify → owner signs in → non-owner refused → `nft_transfer` → new owner signs in → old owner and old session refused (`pnpm e2e:transfer`, `pnpm e2e:server`).
 - **Agent spend grant proven on testnet:** 0.2 NEAR allowed; overspend and unapproved recipient refused by the wallet contract; revoke works (`pnpm e2e:agent`).
-- **Not yet done:** a human clicking through the browser wallet flow (MyNearWallet / Meteor sign-message and transfer).
+- **Not yet done:** a human clicking through the browser wallet flow (Meteor or Intear: sign-message and transfer). MyNearWallet was dropped from the app because it no longer connects to apps.
+- **Update, 12 Nov:** `pnpm demo:bootstrap` creates fresh testnet demo accounts from the faucet, so the scripted journeys no longer need the original team's keys.
 
 ## Decision needed (resolved: option 1)
 
