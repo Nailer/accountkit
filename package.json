@@ -5,6 +5,9 @@
   "description": "AccountKit: a TypeScript SDK for House of Stake Top Level Accounts on NEAR, plus the Clubhouse demo app.",
   "license": "MIT",
   "packageManager": "pnpm@10.2.0",
+  "engines": {
+    "node": ">=20.12"
+  },
   "scripts": {
     "build": "pnpm -r build",
     "test": "pnpm -r test",
