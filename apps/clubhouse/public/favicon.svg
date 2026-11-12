@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="AccountKit">
+  <title>AccountKit</title>
+  <g transform="translate(0 0) scale(1)">
+    <rect width="64" height="64" rx="15" fill="#0F0E0B"/>
+    <rect x="13" y="21" width="30" height="30" rx="8.5" fill="none" stroke="#00EC97" stroke-width="5.5"/>
+    <circle cx="43" cy="21" r="13.6" fill="#0F0E0B"/>
+    <circle cx="43" cy="21" r="10.4" fill="#00EC97"/>
+  </g>
+</svg>
