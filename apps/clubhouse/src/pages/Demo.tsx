@@ -27,6 +27,7 @@ export function Demo({ config }: { config: Config }) {
   const loadStatus = useCallback(() => {
     api.demoStatus().then(setStatus, () => setStatus(null));
   }, []);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: loadStatus is stable; load once on mount
   useEffect(loadStatus, [loadStatus]);
 
   return (

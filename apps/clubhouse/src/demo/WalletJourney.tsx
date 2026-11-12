@@ -84,6 +84,7 @@ export function WalletJourney({ config }: { config: Config }) {
     setNamesError(null);
     api.names(account).then((r) => setNames(r.names), (e) => setNamesError(e.message));
   }, [account]);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: reload the list after signing in or out, as well as on account change
   useEffect(loadNames, [loadNames, members?.ok]);
 
   const signedIn = members?.ok === true;

@@ -22,6 +22,7 @@ export function Nav({ network }: { network: string }) {
     window.addEventListener("scroll", on, { passive: true });
     return () => window.removeEventListener("scroll", on);
   }, []);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: close the mobile menu whenever the route changes
   useEffect(() => setOpen(false), [path]);
 
   return (

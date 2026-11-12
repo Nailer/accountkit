@@ -58,9 +58,11 @@ function Shell() {
     setError(null);
     api.config().then(setConfig, (e) => setError(`API unreachable: ${e.message}`));
   }, []);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: boot is stable (useCallback with no deps); run it once
   useEffect(boot, [boot]);
 
   // New page: start at the top, or at the requested section.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: only on page changes; same-page hash links scroll in the router
   useEffect(() => {
     if (hash && path === "/") {
       const t = setTimeout(() => document.getElementById(hash.slice(1))?.scrollIntoView({ behavior: "smooth" }), 450);
@@ -71,7 +73,7 @@ function Shell() {
       return () => clearTimeout(t);
     }
     window.scrollTo({ top: 0 });
-  }, [path]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [path]);
 
   if (!config) {
     return (
