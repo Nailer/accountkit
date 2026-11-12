@@ -359,7 +359,7 @@ function DemoPaths({ liveAvailable }: { liveAvailable: boolean | null }) {
       to: "/demo#live",
       icon: <PlayIcon />,
       title: "Watch the live run",
-      text: "The demo server walks two test accounts through the whole journey: sign in, turn away a stranger, transfer, lock the old owner out. Every step is a real testnet transaction.",
+      text: "The demo server walks two test accounts through the whole journey: sign in, turn away a stranger, transfer, lock the old owner out. Every step is a real testnet transaction, signature or read, with a link to check it.",
       tag: liveAvailable === false ? "Not available on this server" : "No wallet needed · about 30 seconds",
       primary: true,
     },

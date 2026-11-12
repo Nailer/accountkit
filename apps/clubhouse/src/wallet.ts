@@ -6,7 +6,7 @@ import { setupHereWallet } from "@near-wallet-selector/here-wallet";
 import { setupSender } from "@near-wallet-selector/sender";
 import type { WalletTransaction } from "@accountkit/sdk";
 
-// Browser wallets (MyNearWallet) call Buffer.from on the NEP-413 nonce.
+// Some browser wallets call Buffer.from on the NEP-413 nonce.
 (globalThis as any).Buffer ??= Buffer;
 
 let selectorPromise: Promise<WalletSelector> | null = null;
