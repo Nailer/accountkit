@@ -25,6 +25,7 @@ import {
   type TlaInfo,
 } from "@accountkit/sdk";
 import { DEMO_TASKS, attempt, propose, type TaskId } from "./agent.js";
+import { originAllowed } from "./http.js";
 import { sessionCodec, type Session } from "./session.js";
 import { demoAvailability, runAgent, runOwnership, type DemoConfig, type DemoEvent } from "./demo.js";
 
@@ -105,22 +106,6 @@ async function readJson(req: IncomingMessage): Promise<any> {
   return chunks.length ? JSON.parse(Buffer.concat(chunks).toString()) : {};
 }
 
-/**
- * Blocks cross-site POSTs: a web page on another site must not be able to make this
- * server sign or log anyone in. Requests with no Origin (scripts, curl) are allowed.
- */
-function originAllowed(req: IncomingMessage): boolean {
-  const origin = req.headers.origin;
-  if (!origin) return true;
-  if (ALLOWED_ORIGINS.has(origin)) return true;
-  try {
-    const { hostname } = new URL(origin);
-    return hostname === "localhost" || hostname === "127.0.0.1" || hostname === "[::1]";
-  } catch {
-    return false;
-  }
-}
-
 function inClub(name: string): boolean {
   return CLUB_TLA === null || name.endsWith(`.${CLUB_TLA}`);
 }
@@ -165,7 +150,7 @@ async function currentMember(req: IncomingMessage): Promise<{ ok: true; session:
 async function route(req: IncomingMessage, res: ServerResponse) {
   const url = new URL(req.url ?? "/", "http://localhost");
   const path = url.pathname;
-  if (req.method === "POST" && !originAllowed(req)) {
+  if (req.method === "POST" && !originAllowed(req.headers.origin, ALLOWED_ORIGINS)) {
     return send(res, 403, { error: "cross-site request refused", code: "FORBIDDEN_ORIGIN" });
   }
 
