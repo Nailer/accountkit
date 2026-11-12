@@ -7,18 +7,19 @@
 import { AccountKit, addExtensionTx, grantSpendTx, revokeSpendTx, verifyItem } from "@accountkit/sdk";
 import { attempt, propose, toYocto } from "../server/agent.js";
 import { sendTx, testAccount } from "../server/signer.js";
+import { DEMO, RPC } from "./demo-env.js";
 
-const RPC = process.env.RPC_URL ?? "https://rpc.testnet.fastnear.com";
-const NAME = process.env.NAME ?? "alice-member.akclub.testnet";
-const AGENT = process.env.AGENT ?? "ak-agent.testnet";
-const SHOP = process.env.SHOP ?? "ak-shop.testnet";
+const NAME = DEMO.name;
+const AGENT = DEMO.agent;
+const SHOP = DEMO.approved;
 const kit = new AccountKit({ network: "testnet", rpcUrls: [RPC] });
 let fails = 0;
 const check = (l: string, c: boolean, x = "") => { console.log(`${c ? "PASS" : "FAIL"}  ${l}${x ? `  (${x})` : ""}`); if (!c) fails++; };
 const bal = async (id: string) => BigInt((await kit.rpc.viewAccount(id)).amount);
 
 const owner = verifyItem(await kit.resolve(NAME)).owner!;
-const stranger = owner === "ak-alice.testnet" ? "ak-bob.testnet" : "ak-alice.testnet";
+// Any existing account outside the grant; the same default the server uses.
+const stranger = process.env.AGENT_STRANGER?.trim() || "akclub.testnet";
 const ownerAcct = testAccount("testnet", RPC, owner);
 console.log(`owner ${owner}, agent ${AGENT}, approved recipient ${SHOP}\n`);
 

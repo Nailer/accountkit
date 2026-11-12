@@ -6,12 +6,12 @@
  */
 import { AccountKit, buildAuthorization, verifyItem } from "@accountkit/sdk";
 import { sendTx, testAccount } from "../server/signer.js";
+import { DEMO, RPC } from "./demo-env.js";
 
-const API = process.env.API ?? "http://localhost:8787";
-const RPC = process.env.RPC_URL ?? "https://rpc.testnet.fastnear.com";
-const NAME = process.env.NAME ?? "alice-member.akclub.testnet";
-const A = "ak-alice.testnet";
-const B = "ak-bob.testnet";
+const API = process.env.API ?? "http://127.0.0.1:8787";
+const NAME = DEMO.name;
+const A = DEMO.a;
+const B = DEMO.b;
 const kit = new AccountKit({ network: "testnet", rpcUrls: [RPC] });
 let fails = 0;
 const check = (l: string, c: boolean, x = "") => { console.log(`${c ? "PASS" : "FAIL"}  ${l}${x ? `  (${x})` : ""}`); if (!c) fails++; };

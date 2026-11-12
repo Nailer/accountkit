@@ -2,10 +2,10 @@
 import { AccountKit, addExtensionTx, buildAuthorization, grantSpendTx, revokeSpendTx, verifyItem } from "@accountkit/sdk";
 import { toYocto } from "../server/agent.js";
 import { sendTx, testAccount } from "../server/signer.js";
+import { DEMO, RPC } from "./demo-env.js";
 
-const API = process.env.API ?? "http://localhost:8787";
-const RPC = "https://rpc.testnet.fastnear.com";
-const NAME = process.env.NAME ?? "alice-member.akclub.testnet";
+const API = process.env.API ?? "http://127.0.0.1:8787";
+const NAME = DEMO.name;
 const kit = new AccountKit({ network: "testnet", rpcUrls: [RPC] });
 const owner = verifyItem(await kit.resolve(NAME)).owner!;
 

@@ -9,16 +9,17 @@
  *   5. the new owner signs in -> accepted; the old owner -> refused
  *
  * Runs in either direction: whoever holds the name now hands it to the other.
- * Env: NAME (default alice-member.akclub.testnet), A / B (default ak-alice / ak-bob .testnet)
+ * Accounts come from apps/clubhouse/.env (see `pnpm demo:bootstrap`), else the
+ * original team's ak-alice / ak-bob. Override with NAME, A and B.
  */
 import { AccountKit, buildAuthorization, createSignInRequest, verifyItem, verifySignIn } from "@accountkit/sdk";
 import { sendTx, testAccount } from "../server/signer.js";
+import { DEMO, RPC } from "./demo-env.js";
 
 const NETWORK = "testnet";
-const RPC = process.env.RPC_URL ?? "https://rpc.testnet.fastnear.com";
-const NAME = process.env.NAME ?? "alice-member.akclub.testnet";
-const A = process.env.A ?? "ak-alice.testnet";
-const B = process.env.B ?? "ak-bob.testnet";
+const NAME = DEMO.name;
+const A = DEMO.a;
+const B = DEMO.b;
 const kit = new AccountKit({ network: NETWORK, rpcUrls: [RPC] });
 
 let failures = 0;
