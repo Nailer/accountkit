@@ -1,3 +1,5 @@
+import { formatNear as formatNearAmount } from "@accountkit/sdk";
+
 export interface Check {
   id: string;
   ok: boolean;
@@ -61,11 +63,9 @@ export const api = {
   demoStatus: () => demoStatus(),
 };
 
+/** "1591000000000000000000000" -> "1.591 NEAR" (rounded down, trailing zeros dropped). */
 export function formatNear(yocto: string): string {
-  const n = BigInt(yocto);
-  const whole = n / 10n ** 24n;
-  const frac = ((n % 10n ** 24n) / 10n ** 20n).toString().padStart(4, "0");
-  return `${whole}.${frac} NEAR`;
+  return `${formatNearAmount(yocto, 4)} NEAR`;
 }
 
 export function formatNs(ns: string): string {
