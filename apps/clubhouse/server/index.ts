@@ -26,7 +26,7 @@ import {
   type TlaInfo,
 } from "@accountkit/sdk";
 import { DEMO_TASKS, attempt, propose, type TaskId } from "./agent.js";
-import { HttpError, originAllowed, readJsonBody } from "./http.js";
+import { HttpError, originAllowed, rateLimiter, readJsonBody } from "./http.js";
 import { sessionCodec, type Session } from "./session.js";
 import { demoAvailability, runAgent, runOwnership, type DemoConfig, type DemoEvent } from "./demo.js";
 
@@ -64,6 +64,9 @@ const DEMO: DemoConfig = {
   stranger: AGENT_STRANGER,
 };
 let demoRunning: string | null = null;
+// Per-IP limits: sign-in endpoints and the live run, which spends the demo accounts' test NEAR.
+const signInLimit = rateLimiter(30, 60_000);
+const demoLimit = rateLimiter(6, 10 * 60_000);
 const SECRET = randomBytes(32);
 const CHALLENGE_TTL_MS = 5 * 60_000;
 const SESSION_TTL_MS = 60 * 60_000;
@@ -144,6 +147,13 @@ async function route(req: IncomingMessage, res: ServerResponse) {
   const path = url.pathname;
   if (req.method === "POST" && !originAllowed(req.headers.origin, ALLOWED_ORIGINS)) {
     return send(res, 403, { error: "cross-site request refused", code: "FORBIDDEN_ORIGIN" });
+  }
+  const ip = req.socket.remoteAddress ?? "unknown";
+  if (req.method === "POST" && (path === "/api/challenge" || path === "/api/login") && !signInLimit(ip)) {
+    return send(res, 429, { error: "too many sign-in attempts; wait a minute", code: "RATE_LIMITED" }, { "retry-after": "60" });
+  }
+  if (req.method === "POST" && path.startsWith("/api/demo/") && !demoLimit(ip)) {
+    return send(res, 429, { error: "too many live runs from this address; wait a few minutes", code: "RATE_LIMITED" }, { "retry-after": "600" });
   }
 
   if (req.method === "GET" && path === "/api/config") {
