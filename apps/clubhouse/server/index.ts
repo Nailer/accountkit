@@ -176,6 +176,17 @@ async function route(req: IncomingMessage, res: ServerResponse) {
     return send(res, 429, { error: "too many live runs from this address; wait a few minutes", code: "RATE_LIMITED" }, { "retry-after": "600" });
   }
 
+  // Liveness and chain reachability, for monitoring and for judges checking the setup.
+  if (req.method === "GET" && path === "/api/health") {
+    const started = Date.now();
+    try {
+      const block = await kit.rpc.block();
+      return send(res, 200, { ok: true, network: kit.network, rpc: "reachable", blockHeight: block.height, rpcMs: Date.now() - started, demo: demoAvailability(DEMO) });
+    } catch (e) {
+      return send(res, 503, { ok: false, network: kit.network, rpc: "unreachable", error: (e as Error).message });
+    }
+  }
+
   if (req.method === "GET" && path === "/api/config") {
     return send(res, 200, { network: kit.network, chainId: kit.chainId, club: CLUB_TLA, agent: AGENT });
   }
