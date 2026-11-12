@@ -331,7 +331,11 @@ async function route(req: IncomingMessage, res: ServerResponse) {
   return send(res, 404, { error: "not found" });
 }
 
-createServer((req, res) => {
+const server = createServer((req, res) => {
+  const started = Date.now();
+  res.on("finish", () => {
+    if (process.env.LOG_REQUESTS !== "0") console.log(`${req.method} ${req.url?.split("?")[0]} ${res.statusCode} ${Date.now() - started}ms`);
+  });
   route(req, res).catch((e) => {
     if (e instanceof HttpError) return send(res, e.status, { error: e.message, code: e.code });
     if (e instanceof AccountKitError) {
