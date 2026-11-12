@@ -105,7 +105,7 @@ export function WalletJourney({ config }: { config: Config }) {
     });
 
   const enter = (tla: string) =>
-    run(`enter:${tla}`, `Approve the sign-in message in your wallet`, async () => {
+    run(`enter:${tla}`, "Approve the sign-in message in your wallet", async () => {
       const ch = await api.challenge(tla, account!);
       if (ch.error) throw new Error(ch.error);
       const nonce = decodeBase64(ch.nep413.nonce);

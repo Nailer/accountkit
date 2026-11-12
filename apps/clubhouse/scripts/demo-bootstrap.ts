@@ -68,7 +68,7 @@ function saveKey(accountId: string, kp: KeyPair) {
   mkdirSync(dir, { recursive: true, mode: 0o700 });
   const file = join(dir, `${accountId}.json`);
   const body = { account_id: accountId, public_key: kp.getPublicKey().toString(), private_key: kp.toString() };
-  writeFileSync(file, JSON.stringify(body, null, 2) + "\n", { mode: 0o600 });
+  writeFileSync(file, `${JSON.stringify(body, null, 2)}\n`, { mode: 0o600 });
 }
 
 async function viaFaucet(accountId: string, publicKey: string): Promise<string | null> {
@@ -127,8 +127,7 @@ async function createAccount(accountId: string): Promise<void> {
   }
   if (why && !(await exists(accountId))) {
     throw new Error(
-      `${accountId} could not be created (${why}).\n` +
-        `  The faucet rate-limits by IP; wait a few minutes and run again, or set FUNDER=<your testnet account>.`,
+      `${accountId} could not be created (${why}).\n  The faucet rate-limits by IP; wait a few minutes and run again, or set FUNDER=<your testnet account>.`,
     );
   }
   if (!(await waitFor(accountId))) throw new Error(`${accountId} did not appear on testnet`);
