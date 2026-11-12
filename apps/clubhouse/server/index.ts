@@ -349,3 +349,13 @@ const server = createServer((req, res) => {
 }).listen(PORT, HOST, () => {
   console.log(`Clubhouse API on http://${HOST}:${PORT}  network=${kit.network} chainId=${kit.chainId} club=${CLUB_TLA ?? "(any HoS name)"}`);
 });
+
+// Stop cleanly on Ctrl-C or a platform shutdown: refuse new connections, let in-flight
+// requests finish, and give a running live run up to 10 seconds before exiting.
+for (const signal of ["SIGINT", "SIGTERM"] as const) {
+  process.once(signal, () => {
+    console.log(`${signal}: shutting down${demoRunning ? ` (a ${demoRunning} run is in progress)` : ""}`);
+    server.close(() => process.exit(0));
+    setTimeout(() => process.exit(0), 10_000).unref();
+  });
+}
