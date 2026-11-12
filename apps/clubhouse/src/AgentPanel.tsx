@@ -182,7 +182,7 @@ export function AgentPanel(props: { network: string; tla: string; balanceYocto: 
           <div className="results" aria-live="polite">
             {results.length === 0 && <p className="hint">Results appear here, each with its testnet transaction. Refused attempts are recorded on chain too.</p>}
             {results.map((r, i) => (
-              <div key={i} className={`result ${r.tx.ok ? "result-ok" : "result-bad"}`}>
+              <div key={r.tx.hash === "?" ? `pending-${results.length - i}` : r.tx.hash} className={`result ${r.tx.ok ? "result-ok" : "result-bad"}`}>
                 <span className="result-icon">{r.tx.ok ? <CheckIcon width={16} height={16} /> : <XIcon width={16} height={16} />}</span>
                 <div>
                   <div className="result-title">{r.tx.ok ? "Allowed by the contract" : "Refused by the contract"}</div>
