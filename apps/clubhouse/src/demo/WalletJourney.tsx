@@ -155,6 +155,7 @@ export function WalletJourney({ config }: { config: Config }) {
     <div className="wallet-grid">
       {WALLETS.map((w) => (
         <button
+          type="button"
           key={w.id}
           className="wallet-option"
           disabled={!!busy && !isBusy(`connect:${w.id}`)}

@@ -55,7 +55,7 @@ const CONTRACTS = [
 function CopyValue({ v }: { v: string }) {
   const toast = useToast();
   return (
-    <button className="copy-val mono" onClick={() => copyText(v).then(() => toast("ok", `Copied ${v}`), () => toast("bad", "Couldn't copy"))} aria-label={`Copy ${v}`}>
+    <button type="button" className="copy-val mono" onClick={() => copyText(v).then(() => toast("ok", `Copied ${v}`), () => toast("bad", "Couldn't copy"))} aria-label={`Copy ${v}`}>
       {v} <CopyIcon />
     </button>
   );

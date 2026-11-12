@@ -49,7 +49,7 @@ export function Nav({ network }: { network: string }) {
                 Open the demo
               </ButtonLink>
             )}
-            <button className="nav-burger" onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-controls="mobile-menu" aria-label={open ? "Close menu" : "Open menu"}>
+            <button type="button" className="nav-burger" onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-controls="mobile-menu" aria-label={open ? "Close menu" : "Open menu"}>
               {open ? <XIcon /> : <MenuIcon />}
             </button>
           </div>

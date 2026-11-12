@@ -45,6 +45,7 @@ export function Demo({ config }: { config: Config }) {
           <div className="tabs" role="tablist" aria-label="Ways to try Clubhouse">
             {TABS.map((t) => (
               <button
+                type="button"
                 key={t.id}
                 role="tab"
                 id={`tab-${t.id}`}

@@ -46,7 +46,7 @@ export function CodeBlock({ code, title, tabs }: { code?: string; title?: string
       {tabs && (
         <div className="code-tabs" role="tablist" aria-label="Code examples">
           {tabs.map((t) => (
-            <button key={t.id} role="tab" className="code-tab" aria-selected={t.id === active} onClick={() => setActive(t.id)}>
+            <button type="button" key={t.id} role="tab" className="code-tab" aria-selected={t.id === active} onClick={() => setActive(t.id)}>
               {t.label}
             </button>
           ))}
@@ -59,7 +59,7 @@ export function CodeBlock({ code, title, tabs }: { code?: string; title?: string
           <span />
         </div>
         <span className="code-title">{title ?? "example.ts"}</span>
-        <button className={`code-copy ${copied ? "copied" : ""}`} onClick={copy} aria-label="Copy code">
+        <button type="button" className={`code-copy ${copied ? "copied" : ""}`} onClick={copy} aria-label="Copy code">
           {copied ? <CheckIcon width={14} height={14} /> : <CopyIcon />}
           {copied ? "Copied" : "Copy"}
         </button>

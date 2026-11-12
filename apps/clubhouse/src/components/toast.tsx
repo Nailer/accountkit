@@ -34,7 +34,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             >
               {t.tone === "ok" ? <CheckIcon width={18} height={18} /> : <AlertIcon width={18} height={18} />}
               <span>{t.text}</span>
-              <button onClick={() => setToasts((all) => all.filter((x) => x.id !== t.id))} aria-label="Dismiss">
+              <button type="button" onClick={() => setToasts((all) => all.filter((x) => x.id !== t.id))} aria-label="Dismiss">
                 <XIcon width={14} height={14} />
               </button>
             </motion.div>

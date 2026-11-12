@@ -99,6 +99,7 @@ export function LiveRun({ status, onStatus }: { status: DemoStatus | null; onSta
         <div className="run-picker" role="radiogroup" aria-label="Choose a live run">
           {(Object.keys(INFO) as Kind[]).map((k) => (
             <button
+              type="button"
               key={k}
               role="radio"
               aria-checked={kind === k}
