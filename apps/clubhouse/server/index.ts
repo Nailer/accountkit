@@ -291,11 +291,17 @@ async function route(req: IncomingMessage, res: ServerResponse) {
     demoRunning = which;
     res.writeHead(200, { ...SECURITY_HEADERS, "content-type": "text/event-stream", "cache-control": "no-store", connection: "keep-alive" });
     const emit = (e: DemoEvent) => res.write(`data: ${JSON.stringify({ ...e, at: new Date().toISOString() })}\n\n`);
+    let timer: NodeJS.Timeout | undefined;
     try {
-      await (which === "agent" ? runAgent(kit, DEMO, emit) : runOwnership(kit, DEMO, emit));
+      // A hung RPC must not hold the one-run lock forever.
+      const limit = new Promise<never>((_, reject) => {
+        timer = setTimeout(() => reject(new Error("the run took longer than 3 minutes; testnet RPC may be slow. Try again.")), 3 * 60_000);
+      });
+      await Promise.race([which === "agent" ? runAgent(kit, DEMO, emit) : runOwnership(kit, DEMO, emit), limit]);
     } catch (e) {
       emit({ step: "error", status: "error", title: "The run stopped", detail: (e as Error).message });
     } finally {
+      clearTimeout(timer);
       demoRunning = null;
       res.end();
     }
