@@ -152,7 +152,7 @@ export async function runDemo(kind: "ownership" | "agent", onEvent: (e: DemoEven
     const { value, done } = await reader.read();
     if (done) break;
     buf += dec.decode(value, { stream: true });
-    let i;
+    let i: number;
     while ((i = buf.indexOf("\n\n")) >= 0) {
       const chunk = buf.slice(0, i);
       buf = buf.slice(i + 2);

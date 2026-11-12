@@ -5,7 +5,7 @@ import { base58, base64, hex } from "@scure/base";
 import { BorshWriter, concatBytes } from "./borsh.js";
 import { AccountKitError } from "./errors.js";
 import type { AccountKit } from "./kit.js";
-import type { BlockRef } from "./rpc.js";
+import type { AccessKeyView, BlockRef } from "./rpc.js";
 import { verifyItem } from "./verify.js";
 
 /**
@@ -212,7 +212,7 @@ async function verifyAccessKeyAuthorization(
 
   if (parseRfc3339ToNs(auth.msg.timestamp) > block.timestampNs) fail("timestamp is later than the pinned block");
 
-  let key;
+  let key: AccessKeyView | null;
   try {
     key = await kit.rpc.accessKey(accountId, auth.access_key, ref);
   } catch (e) {
