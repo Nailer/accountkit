@@ -18,11 +18,15 @@
     "e2e:transfer": "pnpm --filter clubhouse exec tsx scripts/e2e-transfer.ts",
     "e2e:server": "pnpm --filter clubhouse exec tsx scripts/e2e-server.ts",
     "e2e:agent": "pnpm --filter clubhouse exec tsx scripts/e2e-agent.ts",
-    "e2e:attack": "pnpm --filter clubhouse exec tsx scripts/e2e-attack.ts"
+    "e2e:attack": "pnpm --filter clubhouse exec tsx scripts/e2e-attack.ts",
+    "lint": "biome lint ."
   },
   "pnpm": {
     "onlyBuiltDependencies": [
       "esbuild"
     ]
+  },
+  "devDependencies": {
+    "@biomejs/biome": "1.9.4"
   }
 }
