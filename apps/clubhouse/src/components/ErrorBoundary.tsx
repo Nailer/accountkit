@@ -43,7 +43,7 @@ export function SlowLoading({ label, afterMs = 10_000 }: { label: string; afterM
     return () => clearTimeout(t);
   }, [afterMs]);
   return (
-    <p className="progress-note" role="status">
+    <output className="progress-note">
       <Spinner /> {label}
       {slow && (
         <>
@@ -53,6 +53,6 @@ export function SlowLoading({ label, afterMs = 10_000 }: { label: string; afterM
           </button>
         </>
       )}
-    </p>
+    </output>
   );
 }
