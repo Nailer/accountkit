@@ -195,7 +195,7 @@ export function LiveRun({ status, onStatus }: { status: DemoStatus | null; onSta
                 <h4>What NEAR did</h4>
                 <p>
                   {kind === "ownership"
-                    ? "Moved the NFT and the account together in one standard transfer, and cleared the old owner's helpers. The account still holds no keys."
+                    ? "Moved the NFT and the account together in one standard transfer, cleared the old owner's agents, and returned the account's spare NEAR to the old owner. The account still holds no keys."
                     : "Stored the limit on the membership account and refused every payment outside it, with its own error message."}
                 </p>
               </div>

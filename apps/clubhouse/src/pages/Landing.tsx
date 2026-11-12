@@ -218,7 +218,7 @@ const STEPS = [
   {
     icon: <SwapIcon />,
     title: "Access follows the owner",
-    text: "Transfer the NFT and the account, what it holds and its access move together. The old owner's next request is refused.",
+    text: "Transfer the NFT and the account and its access move together. The old owner's next request is refused, and their agents are removed.",
   },
   {
     icon: <BotIcon />,

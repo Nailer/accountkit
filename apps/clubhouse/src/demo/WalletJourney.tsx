@@ -245,8 +245,8 @@ export function WalletJourney({ config }: { config: Config }) {
                 <SwapIcon />
               </div>
               <p className="muted">
-                Your wallet sends a standard NFT transfer (<code>nft_transfer</code>) to House of Stake's registry. The account, everything it holds and its Clubhouse
-                access move to the receiver, and you lose access straight away.
+                Your wallet sends a standard NFT transfer (<code>nft_transfer</code>) to House of Stake's registry. The account and its Clubhouse access move to the
+                receiver, and you lose access straight away. House of Stake's wallet sends the account's spare NEAR back to you as part of the transfer.
               </p>
               <div className="field">
                 <label className="field-label" htmlFor="receiver">Receiver's testnet account</label>
