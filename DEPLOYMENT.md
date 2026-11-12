@@ -36,6 +36,24 @@ Keys for all of these live only in the local NEAR CLI keychain (`~/.near-credent
 | Agent tries 0.4 NEAR more: **refused**, "spend exceeds the granted cap" | [5dGh93ia…](https://testnet.nearblocks.io/txns/5dGh93iapiM17xf43x4djFJMarYUMwnTps7yzPcPJ9Ve) |
 | Agent pays an unapproved account: **refused**, "receiver is not in the spend grant" | [BShpmMxL…](https://testnet.nearblocks.io/txns/BShpmMxLupKMGAujtyiBGoFzHpkguk6whAMT7ziSVftW) |
 
+### From a fresh copy of the repository, 12 Nov 2026
+
+`pnpm demo:bootstrap` created `akd-b41c3c-a`, `-b` and `-agent` `.testnet` from the faucet, then `pnpm e2e:transfer`, `e2e:agent` and `e2e:attack` ran with only those keys.
+
+| Step | Transaction |
+|---|---|
+| `rentQuote()` rent of `akdb41c3c-member.akclub.testnet` (1.591 test NEAR) | [fPWXAHRX…](https://testnet.nearblocks.io/txns/fPWXAHRXZu94CTYdeLTrtYV6DfJaTDfj8jJvTrwo1d1) |
+| Transfer a → b (`e2e:transfer`) | [4Hgzh96Q…](https://testnet.nearblocks.io/txns/4Hgzh96QYY9bduFVHVEVUC6ydakrprgXbNEJ7dXFaD9Q) |
+| Hijacked agent pays itself: **refused**, "receiver is not in the spend grant" | [5NfmZMQg…](https://testnet.nearblocks.io/txns/5NfmZMQgqLUi5ePGuFybCY3DNXEX6LKbs7sULxENPK7D) |
+| Hijacked agent adds an accomplice: **refused**, "only the owner may perform this operation" | [GQKLbJXe…](https://testnet.nearblocks.io/txns/GQKLbJXebXwuh8jLMWWsQfJDK4KE6wdLUFXDek61P1yW) |
+| Hijacked agent removes the owner: **refused** | [BboxK85E…](https://testnet.nearblocks.io/txns/BboxK85Ea9iAZmTjbdsND4qCDHn6JyxyTjKp5Ay43AC4) |
+| Sale in the middle of a payout (`nft_transfer`) | [A8QmDhpa…](https://testnet.nearblocks.io/txns/A8QmDhpaYdSv7dztW77vQtS8p4Dr4SYzjmoNPcJzeWVz) |
+| Agent's next payment after the sale: **refused**, extension not enabled | [84qj1nU4…](https://testnet.nearblocks.io/txns/84qj1nU4PQyjbxFMLn5cqVxaU5BKErc8URddBaewzx2r) |
+
+## What a transfer does to the account's NEAR
+
+House of Stake's wallet sweeps the account's spare NEAR (everything above its storage reserve) to the **outgoing** payout account on every sale or transfer, then makes the new owner the payout account (`hos-wallet/src/lib.rs`, `apply_rotation` and `sweep_to`). In the sale above, the account went from 0.610 to 0.010 test NEAR and the seller received it. A buyer gets control of the account, not its spare NEAR. The demo funds the membership account again before each agent run for this reason.
+
 The e2e scripts move the membership back and forth, so its current owner depends on the last run. Check it with the Clubhouse lookup box or `pnpm --filter @accountkit/sdk example:resolve alice-member.akclub.testnet testnet`.
 
 ## An incident worth knowing about
