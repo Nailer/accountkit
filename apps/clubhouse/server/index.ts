@@ -335,7 +335,8 @@ async function route(req: IncomingMessage, res: ServerResponse) {
 createServer((req, res) => {
   route(req, res).catch((e) => {
     if (e instanceof AccountKitError) {
-      const status = e.code === "RPC_UNAVAILABLE" ? 502 : e.code === "INVALID_NAME" ? 400 : 404;
+      const status =
+        e.code === "RPC_UNAVAILABLE" ? 502 : e.code === "INVALID_NAME" || e.code === "INVALID_INPUT" ? 400 : e.code === "WRONG_OWNER" ? 403 : 404;
       return send(res, status, { error: e.message, code: e.code });
     }
     console.error(e);
