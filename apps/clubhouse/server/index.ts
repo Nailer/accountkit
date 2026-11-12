@@ -14,7 +14,7 @@
  *   HOST        interface to listen on (default 127.0.0.1: this machine only)
  *   ALLOWED_ORIGINS  extra browser origins allowed to POST, comma-separated
  */
-import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
+import { randomBytes } from "node:crypto";
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import {
   AccountKit,
@@ -25,6 +25,7 @@ import {
   type TlaInfo,
 } from "@accountkit/sdk";
 import { DEMO_TASKS, attempt, propose, type TaskId } from "./agent.js";
+import { sessionCodec, type Session } from "./session.js";
 import { demoAvailability, runAgent, runOwnership, type DemoConfig, type DemoEvent } from "./demo.js";
 
 // Load apps/clubhouse/.env when present (Node 20.12+). Real env vars win.
@@ -80,34 +81,11 @@ function sweep() {
   for (const [id, c] of challenges) if (c.expiresAt < now) challenges.delete(id);
 }
 
-/* ---------- sessions: HMAC-signed cookie ---------- */
+/* ---------- sessions: HMAC-signed cookie (server/session.ts) ---------- */
 
-interface Session {
-  tla: string;
-  owner: string;
-  exp: number;
-}
-
-function sign(data: string): string {
-  return createHmac("sha256", SECRET).update(data).digest("base64url");
-}
-
-function encodeSession(s: Session): string {
-  const body = Buffer.from(JSON.stringify(s)).toString("base64url");
-  return `${body}.${sign(body)}`;
-}
-
-function readSession(req: IncomingMessage): Session | null {
-  const raw = /(?:^|;\s*)ck_session=([^;]+)/.exec(req.headers.cookie ?? "")?.[1];
-  if (!raw) return null;
-  const [body, mac] = raw.split(".");
-  if (!body || !mac) return null;
-  const expected = Buffer.from(sign(body));
-  const given = Buffer.from(mac);
-  if (expected.length !== given.length || !timingSafeEqual(expected, given)) return null;
-  const s = JSON.parse(Buffer.from(body, "base64url").toString()) as Session;
-  return s.exp > Date.now() ? s : null;
-}
+const sessions = sessionCodec(SECRET);
+const encodeSession = sessions.encode;
+const readSession = (req: IncomingMessage) => sessions.read(req.headers.cookie);
 
 /* ---------- helpers ---------- */
 
