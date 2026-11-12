@@ -11,6 +11,8 @@
  *   CHAIN_ID    chain id inside NEP-641 messages (default = network; sandbox = testnet)
  *   CLUB_TLA    only names under this TLA count as memberships (optional)
  *   PORT        default 8787
+ *   HOST        interface to listen on (default 127.0.0.1: this machine only)
+ *   ALLOWED_ORIGINS  extra browser origins allowed to POST, comma-separated
  */
 import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
@@ -45,6 +47,9 @@ const AGENT = process.env.AGENT_ACCOUNT?.trim() || null;
 const AGENT_APPROVED = process.env.AGENT_APPROVED?.trim() || "ak-shop.testnet";
 const AGENT_STRANGER = process.env.AGENT_STRANGER?.trim() || "akclub.testnet";
 const PORT = Number(process.env.PORT ?? 8787);
+// Listen on this machine only unless HOST says otherwise: the live run signs testnet transactions.
+const HOST = process.env.HOST?.trim() || "127.0.0.1";
+const ALLOWED_ORIGINS = new Set((process.env.ALLOWED_ORIGINS ?? "").split(",").map((s) => s.trim()).filter(Boolean));
 // Live testnet run (server-signed test accounts). Available only where their keys exist.
 const DEMO: DemoConfig = {
   network: NETWORK,
@@ -122,6 +127,22 @@ async function readJson(req: IncomingMessage): Promise<any> {
   return chunks.length ? JSON.parse(Buffer.concat(chunks).toString()) : {};
 }
 
+/**
+ * Blocks cross-site POSTs: a web page on another site must not be able to make this
+ * server sign or log anyone in. Requests with no Origin (scripts, curl) are allowed.
+ */
+function originAllowed(req: IncomingMessage): boolean {
+  const origin = req.headers.origin;
+  if (!origin) return true;
+  if (ALLOWED_ORIGINS.has(origin)) return true;
+  try {
+    const { hostname } = new URL(origin);
+    return hostname === "localhost" || hostname === "127.0.0.1" || hostname === "[::1]";
+  } catch {
+    return false;
+  }
+}
+
 function inClub(name: string): boolean {
   return CLUB_TLA === null || name.endsWith(`.${CLUB_TLA}`);
 }
@@ -166,6 +187,9 @@ async function currentMember(req: IncomingMessage): Promise<{ ok: true; session:
 async function route(req: IncomingMessage, res: ServerResponse) {
   const url = new URL(req.url ?? "/", "http://localhost");
   const path = url.pathname;
+  if (req.method === "POST" && !originAllowed(req)) {
+    return send(res, 403, { error: "cross-site request refused", code: "FORBIDDEN_ORIGIN" });
+  }
 
   if (req.method === "GET" && path === "/api/config") {
     return send(res, 200, { network: kit.network, chainId: kit.chainId, club: CLUB_TLA, agent: AGENT });
@@ -316,6 +340,6 @@ createServer((req, res) => {
     console.error(e);
     send(res, 500, { error: "internal error" });
   });
-}).listen(PORT, () => {
-  console.log(`Clubhouse API on http://localhost:${PORT}  network=${kit.network} chainId=${kit.chainId} club=${CLUB_TLA ?? "(any HoS name)"}`);
+}).listen(PORT, HOST, () => {
+  console.log(`Clubhouse API on http://${HOST}:${PORT}  network=${kit.network} chainId=${kit.chainId} club=${CLUB_TLA ?? "(any HoS name)"}`);
 });

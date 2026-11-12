@@ -6,6 +6,7 @@ export default defineConfig({
   define: { global: "globalThis", "process.env": "{}" },
   server: {
     port: 5173,
-    proxy: { "/api": `http://localhost:${process.env.API_PORT ?? 8787}` },
+    // 127.0.0.1, not localhost: the API listens on IPv4 loopback only.
+    proxy: { "/api": `http://127.0.0.1:${process.env.API_PORT ?? 8787}` },
   },
 });
