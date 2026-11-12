@@ -461,9 +461,12 @@ function Truth() {
     { what: "Transfer a membership", status: "live", note: "Testnet. Standard nft_transfer on the registry." },
     { what: "Rent a membership name", status: "live", note: "Testnet. Paid with test NEAR." },
     { what: "Agent spending limits", status: "live", note: "Testnet. Enforced by the account's own contract." },
+    { what: "A hijacked agent, stopped on chain", status: "live", note: "Testnet, pnpm e2e:attack. Paying itself, adding an accomplice or removing the owner is refused." },
+    { what: "Selling ends the seller's access", status: "live", note: "Testnet. Agents and grants are cleared; spare NEAR goes back to the seller." },
     { what: "Read real mainnet names", status: "read", note: "House of Stake's live registry.hos, read-only." },
     { what: "The demo agent's decisions", status: "scripted", note: "Fixed tasks, not an AI model. The limits it hits are real." },
-    { what: "Activity history, npm package, mainnet transactions", status: "not", note: "Not built for this demo." },
+    { what: "Activity history", status: "read", note: "Linked to NearBlocks from each membership; no indexer of our own." },
+    { what: "npm package, mainnet transactions", status: "not", note: "Not built for this demo." },
   ];
   const label = { live: "Live on testnet", read: "Read-only", scripted: "Scripted", not: "Not built" } as const;
   const tone = { live: "ok", read: undefined, scripted: "warn", not: "bad" } as const;
