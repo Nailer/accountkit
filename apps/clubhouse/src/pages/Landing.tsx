@@ -193,7 +193,7 @@ function Problem() {
             </div>
             <pre className="after-code">
               <span className="k">const</span> {"{ result }"} = <span className="k">await</span> kit.<span className="f">verify</span>(<span className="s">"alice-member.akclub.testnet"</span>);
-              {"\n"}result.owner  <span className="c">// "ak-alice.testnet", after 13 checks</span>
+              {"\n"}result.owner  <span className="c">{'// "ak-alice.testnet", after 13 checks'}</span>
             </pre>
           </Reveal>
         </div>
@@ -269,7 +269,7 @@ function StepVisual({ i }: { i: number }) {
       <div className="viz viz-swap">
         <div className="swap-row">
           <div className="who out"><span className="mono">ak-alice.testnet</span><span className="viz-sub">old owner</span></div>
-          <motion.span className="swap-arrow" animate={{ x: [0, 8, 0] }} transition={{ repeat: Infinity, duration: 1.8 }}><SwapIcon /></motion.span>
+          <motion.span className="swap-arrow" animate={{ x: [0, 8, 0] }} transition={{ repeat: Number.POSITIVE_INFINITY, duration: 1.8 }}><SwapIcon /></motion.span>
           <div className="who in"><span className="mono">ak-bob.testnet</span><span className="viz-sub">new owner</span></div>
         </div>
         <div className="viz-verdict ok"><CheckIcon width={16} height={16} /> ak-bob.testnet signs in</div>
