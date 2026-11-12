@@ -81,9 +81,16 @@ interface Challenge {
 }
 const challenges = new Map<string, Challenge>();
 
+const MAX_CHALLENGES = 5_000;
+
+/** Drops expired challenges, and the oldest ones if the store is still full (Map keeps insertion order). */
 function sweep() {
   const now = Date.now();
   for (const [id, c] of challenges) if (c.expiresAt < now) challenges.delete(id);
+  for (const id of challenges.keys()) {
+    if (challenges.size < MAX_CHALLENGES) break;
+    challenges.delete(id);
+  }
 }
 
 /* ---------- sessions: HMAC-signed cookie (server/session.ts) ---------- */
