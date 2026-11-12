@@ -4,7 +4,7 @@ import { api, type Config, type DemoStatus } from "../api";
 import { WaveField } from "../components/motion";
 import { LiveRun } from "../demo/LiveRun";
 import { Lookup } from "../demo/Lookup";
-import { Spinner } from "../components/primitives";
+import { ErrorBoundary, SlowLoading } from "../components/ErrorBoundary";
 
 // Wallet SDKs are large; load them only when someone opens the wallet path.
 const WalletJourney = lazy(() => import("../demo/WalletJourney").then((m) => ({ default: m.WalletJourney })));
@@ -70,9 +70,11 @@ export function Demo({ config }: { config: Config }) {
           <motion.div key={tab} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}>
             {tab === "live" && <LiveRun status={status} onStatus={loadStatus} />}
             {tab === "wallet" && (
-              <Suspense fallback={<p className="progress-note"><Spinner /> Loading wallet connectors…</p>}>
-                <WalletJourney config={config} />
-              </Suspense>
+              <ErrorBoundary resetKey={tab}>
+                <Suspense fallback={<SlowLoading label="Loading wallet connectors…" />}>
+                  <WalletJourney config={config} />
+                </Suspense>
+              </ErrorBoundary>
             )}
             {tab === "lookup" && <Lookup network={config.network} />}
           </motion.div>

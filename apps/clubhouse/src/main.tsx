@@ -4,6 +4,7 @@ import { StrictMode, useCallback, useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { api, type Config } from "./api";
 import { Footer, Nav } from "./components/Chrome";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 import { ErrorAlert, Spinner } from "./components/primitives";
 import { ToastProvider } from "./components/toast";
 import { RouterProvider, useRoute } from "./lib/router";
@@ -98,7 +99,7 @@ function Shell() {
           exit={{ opacity: 0, y: -10 }}
           transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
         >
-          {page}
+          <ErrorBoundary resetKey={path}>{page}</ErrorBoundary>
         </motion.main>
       </AnimatePresence>
       <Footer network={config.network} club={config.club} />

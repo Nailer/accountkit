@@ -174,3 +174,4 @@
   .net-badge { padding: 5px 9px 5px 8px; font-size: 10.5px; }
 }
 .demo > *, .live > *, .lookup > *, .journey-grid > *, .member-grid > *, .dev-hero-grid > *, .dev-two > *, .api-groups > * { min-width: 0; }
+button.text-link { border: 0; padding: 0; cursor: pointer; font: inherit; }
