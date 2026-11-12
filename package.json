@@ -11,6 +11,7 @@
     "typecheck": "pnpm -r typecheck",
     "dev": "pnpm --filter @accountkit/sdk build && pnpm --filter clubhouse dev",
     "test:live": "pnpm --filter @accountkit/sdk test:live",
+    "demo:bootstrap": "pnpm --filter @accountkit/sdk build && pnpm --filter clubhouse exec tsx scripts/demo-bootstrap.ts",
     "e2e:transfer": "pnpm --filter clubhouse exec tsx scripts/e2e-transfer.ts",
     "e2e:server": "pnpm --filter clubhouse exec tsx scripts/e2e-server.ts",
     "e2e:agent": "pnpm --filter clubhouse exec tsx scripts/e2e-agent.ts"
