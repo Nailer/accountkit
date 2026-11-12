@@ -25,7 +25,7 @@ import {
   type TlaInfo,
 } from "@accountkit/sdk";
 import { DEMO_TASKS, attempt, propose, type TaskId } from "./agent.js";
-import { originAllowed } from "./http.js";
+import { HttpError, originAllowed, readJsonBody } from "./http.js";
 import { sessionCodec, type Session } from "./session.js";
 import { demoAvailability, runAgent, runOwnership, type DemoConfig, type DemoEvent } from "./demo.js";
 
@@ -95,16 +95,7 @@ function send(res: ServerResponse, status: number, body: unknown, headers: Recor
   res.end(JSON.stringify(body, (_k, v) => (typeof v === "bigint" ? v.toString() : v)));
 }
 
-async function readJson(req: IncomingMessage): Promise<any> {
-  const chunks: Buffer[] = [];
-  let size = 0;
-  for await (const c of req) {
-    size += (c as Buffer).length;
-    if (size > 64 * 1024) throw new Error("body too large");
-    chunks.push(c as Buffer);
-  }
-  return chunks.length ? JSON.parse(Buffer.concat(chunks).toString()) : {};
-}
+const readJson = (req: IncomingMessage): Promise<any> => readJsonBody(req);
 
 function inClub(name: string): boolean {
   return CLUB_TLA === null || name.endsWith(`.${CLUB_TLA}`);
@@ -297,6 +288,7 @@ async function route(req: IncomingMessage, res: ServerResponse) {
 
 createServer((req, res) => {
   route(req, res).catch((e) => {
+    if (e instanceof HttpError) return send(res, e.status, { error: e.message, code: e.code });
     if (e instanceof AccountKitError) {
       const status =
         e.code === "RPC_UNAVAILABLE" ? 502 : e.code === "INVALID_NAME" || e.code === "INVALID_INPUT" ? 400 : e.code === "WRONG_OWNER" ? 403 : 404;

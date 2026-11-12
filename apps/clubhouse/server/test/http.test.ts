@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { originAllowed } from "../http.js";
+import { HttpError, originAllowed, readJsonBody } from "../http.js";
 
 describe("originAllowed", () => {
   it("allows requests without an Origin (scripts, curl)", () => {
@@ -16,5 +16,30 @@ describe("originAllowed", () => {
 
   it("allows an origin listed in ALLOWED_ORIGINS", () => {
     expect(originAllowed("https://clubhouse.example", new Set(["https://clubhouse.example"]))).toBe(true);
+  });
+});
+
+describe("readJsonBody", () => {
+  const body = async function* (...parts: string[]) {
+    for (const p of parts) yield Buffer.from(p);
+  };
+
+  it("parses a JSON object sent in pieces", async () => {
+    expect(await readJsonBody(body('{"tla":"a.b', '.testnet"}'))).toEqual({ tla: "a.b.testnet" });
+  });
+
+  it("treats an empty body as an empty object", async () => {
+    expect(await readJsonBody(body())).toEqual({});
+  });
+
+  it.each(["{not json", "[1,2]", "null", "42"])("refuses %s with a 400", async (raw) => {
+    const err = await readJsonBody(body(raw)).catch((e) => e);
+    expect(err).toBeInstanceOf(HttpError);
+    expect(err.status).toBe(400);
+  });
+
+  it("refuses an oversized body with a 413", async () => {
+    const err = await readJsonBody(body("x".repeat(20)), 10).catch((e) => e);
+    expect(err.status).toBe(413);
   });
 });

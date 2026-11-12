@@ -15,3 +15,35 @@ export function originAllowed(origin: string | undefined, allowed: ReadonlySet<s
     return false;
   }
 }
+
+/** An error that maps straight to an HTTP status and a JSON body. */
+export class HttpError extends Error {
+  constructor(
+    readonly status: number,
+    message: string,
+    readonly code?: string,
+  ) {
+    super(message);
+  }
+}
+
+/** Reads a JSON object body of at most `limit` bytes. Bad input is a 4xx, never a 500. */
+export async function readJsonBody(req: AsyncIterable<Buffer | string>, limit = 64 * 1024): Promise<Record<string, unknown>> {
+  const chunks: Buffer[] = [];
+  let size = 0;
+  for await (const c of req) {
+    const b = typeof c === "string" ? Buffer.from(c) : c;
+    size += b.length;
+    if (size > limit) throw new HttpError(413, `request body is larger than ${limit} bytes`, "BODY_TOO_LARGE");
+    chunks.push(b);
+  }
+  if (chunks.length === 0) return {};
+  let value: unknown;
+  try {
+    value = JSON.parse(Buffer.concat(chunks).toString("utf8"));
+  } catch {
+    throw new HttpError(400, "request body is not valid JSON", "BAD_JSON");
+  }
+  if (value === null || typeof value !== "object" || Array.isArray(value)) throw new HttpError(400, "request body must be a JSON object", "BAD_JSON");
+  return value as Record<string, unknown>;
+}
