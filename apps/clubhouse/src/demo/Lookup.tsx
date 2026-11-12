@@ -6,6 +6,8 @@ import { SearchIcon } from "../icons";
 import { MembershipDetail } from "./MembershipDetail";
 
 const EXAMPLES = ["alice-member.akclub.testnet", "shop-membership-01.akclub.testnet"];
+/** A real account that is not a House of Stake name: shows what a refusal looks like. */
+const REFUSED_EXAMPLE = { testnet: "wrap.testnet", mainnet: "wrap.near" } as Record<string, string>;
 
 export function Lookup({ network }: { network: string }) {
   const [name, setName] = useState("");
@@ -76,6 +78,15 @@ export function Lookup({ network }: { network: string }) {
                     {i < EXAMPLES.length - 1 ? " or " : "."}
                   </span>
                 ))}
+                {REFUSED_EXAMPLE[network] && (
+                  <>
+                    {" "}To see a refusal, try{" "}
+                    <button type="button" className="inline-example mono" onClick={() => { const ex = REFUSED_EXAMPLE[network]!; setName(ex); setTouched(true); check(ex); }}>
+                      {REFUSED_EXAMPLE[network]}
+                    </button>
+                    , a normal account.
+                  </>
+                )}
               </>
             )}
           </p>
