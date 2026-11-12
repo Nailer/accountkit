@@ -94,7 +94,11 @@ export function Developers({ config }: { config: Config }) {
             <Reveal delay={0.1}><p className="lede">Until the package is published, use it from the monorepo. Node 20.12+ and pnpm 10.</p></Reveal>
             <Reveal delay={0.15}>
               <Alert tone="info" title="What's verified">
-                <p>Unit tests cover Borsh, NEP-641 hashing, sign-in round trips, verification refusing tampered records and transaction shapes. The live test reads a real mainnet name from registry.hos.</p>
+                <p>
+                  Offline tests cover Borsh and NEP-641 hashing, sign-in, each of the 13 checks, safe transfers, spend-grant validation, renting, NEAR amounts and RPC
+                  failover. The live test reads a real mainnet name from registry.hos. The e2e scripts run every journey on testnet, including a hijacked agent being
+                  stopped on chain.
+                </p>
               </Alert>
             </Reveal>
           </div>
@@ -105,9 +109,15 @@ pnpm --filter @accountkit/sdk build
 # read and verify a real mainnet name (free, read-only)
 pnpm test:live
 
-# run Clubhouse against our testnet deployment
-cp apps/clubhouse/.env.example apps/clubhouse/.env
-pnpm --filter clubhouse dev`} />
+# your own testnet demo accounts (faucet, about 1 minute)
+pnpm demo:bootstrap
+pnpm demo:status
+
+# every journey on testnet: transfer, agent limits, attack
+pnpm e2e:all
+
+# run Clubhouse
+pnpm dev`} />
           </Reveal>
         </div>
       </section>
