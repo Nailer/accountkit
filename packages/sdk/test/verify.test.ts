@@ -60,6 +60,73 @@ describe("verifyItem", () => {
   });
 });
 
+describe("verifyItem: each check can fail on its own", () => {
+  const failing = (mutate: (i: ReturnType<typeof fixture>) => void) => {
+    const info = fixture();
+    mutate(info);
+    const v = verifyItem(info);
+    return { v, failed: v.checks.filter((c) => !c.ok).map((c) => c.id) };
+  };
+
+  it("names exactly one failed check for a frozen lease, and keeps the record ok", () => {
+    const { v, failed } = failing((i) => {
+      i.lease.frozen = "SelfFrozen";
+    });
+    expect(failed).toEqual(["not-frozen"]);
+    expect(v.ok).toBe(true);
+    expect(v.active).toBe(false);
+  });
+
+  it("marks a retired item inactive", () => {
+    const { failed, v } = failing((i) => {
+      i.item.status = "Retired";
+    });
+    expect(failed).toContain("item-active");
+    expect(v.active).toBe(false);
+  });
+
+  it("refuses an owner who isn't an extension of the account", () => {
+    const { failed, v } = failing((i) => {
+      i.extensions = ["ext.hos"];
+    });
+    expect(failed).toEqual(["owner-is-extension"]);
+    expect(v.ok).toBe(false);
+  });
+
+  it("refuses a lease authority other than House of Stake's extension", () => {
+    const { failed } = failing((i) => {
+      i.lease.authority = "someone-else.near";
+    });
+    expect(failed).toEqual(["authority-is-hos-extension"]);
+  });
+
+  it("refuses a name the registry doesn't know", () => {
+    const { failed, v } = failing((i) => {
+      i.token = null;
+    });
+    expect(failed).toContain("registry-has-token");
+    expect(v.ok).toBe(false);
+  });
+
+  it("returns all 13 checks with stable ids, in order", () => {
+    expect(verifyItem(fixture()).checks.map((c) => c.id)).toEqual([
+      "registry-has-token",
+      "item-spec",
+      "item-names-collection",
+      "item-names-itself",
+      "owners-agree",
+      "runs-registrar-wallet",
+      "authority-is-hos-extension",
+      "owner-is-extension",
+      "no-access-keys",
+      "item-active",
+      "lease-active",
+      "not-frozen",
+      "lease-not-expired",
+    ]);
+  });
+});
+
 describe("transaction builders", () => {
   it("transfers through the registry's NEP-171 nft_transfer with 1 yoctoNEAR", () => {
     const tx = transferTx(fixture(), "carol.near");
