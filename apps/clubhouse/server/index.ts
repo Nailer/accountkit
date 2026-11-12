@@ -20,6 +20,7 @@ import {
   AccountKit,
   AccountKitError,
   createSignInRequest,
+  isValidAccountId,
   verifyItem,
   verifySignIn,
   type TlaInfo,
@@ -169,20 +170,23 @@ async function route(req: IncomingMessage, res: ServerResponse) {
   }
 
   if (req.method === "POST" && path === "/api/challenge") {
-    const { tla, owner } = await readJson(req);
-    if (typeof tla !== "string" || typeof owner !== "string") return send(res, 400, { error: "tla and owner are required" });
-    if (!inClub(tla.toLowerCase())) return send(res, 403, { error: `${tla} is not a ${CLUB_TLA} membership` });
+    const body = await readJson(req);
+    const tla = typeof body.tla === "string" ? body.tla.trim().toLowerCase() : "";
+    const owner = typeof body.owner === "string" ? body.owner.trim().toLowerCase() : "";
+    if (!tla || !owner) return send(res, 400, { error: "tla and owner are required", code: "INVALID_NAME" });
+    if (!isValidAccountId(tla) || !isValidAccountId(owner)) return send(res, 400, { error: "tla and owner must be NEAR account ids", code: "INVALID_NAME" });
+    if (!inClub(tla)) return send(res, 403, { error: `${tla} is not a ${CLUB_TLA} membership` });
     sweep();
     const id = randomBytes(16).toString("hex");
     const expiresAt = Date.now() + CHALLENGE_TTL_MS;
     const request = createSignInRequest({
-      tla: tla.toLowerCase(),
+      tla,
       owner,
       chainId: kit.chainId,
       payload: {
         domain: "Clubhouse",
         action: "Login",
-        msg: JSON.stringify({ tla: tla.toLowerCase(), challenge: id, expires: new Date(expiresAt).toISOString() }),
+        msg: JSON.stringify({ tla, challenge: id, expires: new Date(expiresAt).toISOString() }),
       },
     });
     challenges.set(id, { tla: request.tla, owner, payload: request.payload, expiresAt });
