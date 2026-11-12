@@ -52,6 +52,17 @@ export function Demo({ config }: { config: Config }) {
                 id={`tab-${t.id}`}
                 aria-selected={tab === t.id}
                 aria-controls={`panel-${t.id}`}
+                tabIndex={tab === t.id ? 0 : -1}
+                onKeyDown={(e) => {
+                  // WAI-ARIA tabs: arrows move between tabs, Home and End jump to the ends.
+                  const i = TABS.findIndex((x) => x.id === t.id);
+                  const next =
+                    e.key === "ArrowRight" ? (i + 1) % TABS.length : e.key === "ArrowLeft" ? (i - 1 + TABS.length) % TABS.length : e.key === "Home" ? 0 : e.key === "End" ? TABS.length - 1 : -1;
+                  if (next < 0) return;
+                  e.preventDefault();
+                  navigate(`/demo#${TABS[next]!.id}`);
+                  document.getElementById(`tab-${TABS[next]!.id}`)?.focus();
+                }}
                 className={`tab ${tab === t.id ? "active" : ""}`}
                 onClick={() => navigate(`/demo#${t.id}`)}
               >
