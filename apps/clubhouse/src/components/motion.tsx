@@ -25,6 +25,7 @@ export function SplitWords({ text, className, delay = 0 }: { text: string; class
   return (
     <span className={className} aria-label={text}>
       {words.map((w, i) => (
+        // biome-ignore lint/suspicious/noArrayIndexKey: words never reorder; position is identity
         <span key={i} aria-hidden="true" style={{ display: "inline-block", overflow: "hidden", verticalAlign: "top", paddingBottom: "0.08em" }}>
           <motion.span
             style={{ display: "inline-block" }}
@@ -97,6 +98,7 @@ export function WaveField({ lines = 9, height = 260, className, tone = "ink" }: 
         </linearGradient>
       </defs>
       {Array.from({ length: lines }, (_, i) => (
+        // biome-ignore lint/suspicious/noArrayIndexKey: a fixed set of decorative lines
         <path key={i} fill="none" stroke={`url(#wf-${tone})`} strokeWidth={i === Math.floor(lines / 2) ? 1.6 : 1} opacity={i === Math.floor(lines / 2) ? 0.9 : 0.22 + (i / lines) * 0.25} className={i === Math.floor(lines / 2) ? "wave-hero-line" : undefined} />
       ))}
     </svg>

@@ -1,3 +1,4 @@
+// biome-ignore lint/style/useNodejsImportProtocol: the npm "buffer" polyfill for browsers, not Node's module
 import { Buffer } from "buffer";
 import { setupWalletSelector, type Wallet, type WalletSelector } from "@near-wallet-selector/core";
 import { setupMeteorWallet } from "@near-wallet-selector/meteor-wallet";

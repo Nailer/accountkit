@@ -101,6 +101,7 @@ export function LiveRun({ status, onStatus }: { status: DemoStatus | null; onSta
             <button
               type="button"
               key={k}
+              // biome-ignore lint/a11y/useSemanticElements: a styled card group; roles and aria-checked give radio semantics
               role="radio"
               aria-checked={kind === k}
               className={`run-option ${kind === k ? "selected" : ""}`}

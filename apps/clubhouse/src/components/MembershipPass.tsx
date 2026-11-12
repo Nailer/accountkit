@@ -75,6 +75,7 @@ export function MembershipPass({ m, loading, label = "Live from testnet", intera
               const x = (i % 6) * 6 + 2;
               const y = Math.floor(i / 6) * 6 + 2;
               const on = (m?.name ?? "clubhouse").charCodeAt(i % (m?.name.length ?? 9)) % 3 !== 0;
+              // biome-ignore lint/suspicious/noArrayIndexKey: a fixed decorative grid
               return on ? <rect key={i} x={x} y={y} width="5" height="5" rx="1" /> : null;
             })}
           </svg>
