@@ -251,14 +251,14 @@ function StepVisual({ i }: { i: number }) {
     return (
       <div className="viz viz-flow">
         {[
-          [<WalletIcon width={16} height={16} />, "Owner's wallet", "signs a message"],
-          [<KeyIcon width={16} height={16} />, "Membership account", "w_resolve_auth → \"ask my owner\""],
-          [<ShieldCheckIcon width={16} height={16} />, "AccountKit", "checks the owner's signature and key"],
-          [<DoorIcon width={16} height={16} />, "Clubhouse", "lets the owner in"],
-        ].map(([icon, a, b], k) => (
-          <motion.div key={k} className="flow-row" initial={{ opacity: 0, x: 14 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.12 * k }}>
-            <span className="flow-icon">{icon}</span>
-            <span><b>{a as string}</b><span className="viz-sub">{b as string}</span></span>
+          { Icon: WalletIcon, who: "Owner's wallet", does: "signs a message" },
+          { Icon: KeyIcon, who: "Membership account", does: 'w_resolve_auth → "ask my owner"' },
+          { Icon: ShieldCheckIcon, who: "AccountKit", does: "checks the owner's signature and key" },
+          { Icon: DoorIcon, who: "Clubhouse", does: "lets the owner in" },
+        ].map(({ Icon, who, does }, k) => (
+          <motion.div key={who} className="flow-row" initial={{ opacity: 0, x: 14 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.12 * k }}>
+            <span className="flow-icon"><Icon width={16} height={16} /></span>
+            <span><b>{who}</b><span className="viz-sub">{does}</span></span>
           </motion.div>
         ))}
         <div className="viz-verdict ok"><CheckIcon width={16} height={16} /> Signed in. Zero transactions.</div>
