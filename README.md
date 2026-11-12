@@ -31,9 +31,9 @@ pnpm --filter @accountkit/sdk build
 
 | # | Run | You should see | What it proves |
 |---|---|---|---|
-| 1 | `pnpm --filter @accountkit/sdk test` | `16 passed`, `4 skipped` | Hashing, signing and verification logic, offline |
+| 1 | `pnpm test` | SDK `79 passed`, `4 skipped`; API `26 passed` | Verification, sign-in, transfer and grant rules, RPC failover and the API's security checks, offline |
 | 2 | `pnpm test:live` | `ibuiltthisshit.bid VERIFIED owner: dizzy123.near` and 13 `ok` lines | The SDK reads House of Stake's **live mainnet** contracts correctly |
-| 3 | `pnpm demo:bootstrap` | 3 new testnet accounts, a membership rented and `13/13 checks` | You get your own demo accounts. No keys from us are needed. |
+| 3 | `pnpm demo:bootstrap`, then `pnpm demo:status` | 3 new testnet accounts, a membership rented and `13/13 checks`; then `ready` | You get your own demo accounts. No keys from us are needed. |
 | 4 | `pnpm e2e:transfer` | 10 `PASS` lines and a NearBlocks link | Access follows the NFT: the new owner gets in and the old owner is refused |
 | 5 | `pnpm e2e:agent` | 8–9 `PASS` lines, `all checks passed` | An agent's budget is enforced on chain: overspending and unapproved receivers are refused |
 | 6 | `pnpm e2e:attack` | 11–12 `PASS` lines, `all checks passed` | A hijacked agent can't escape its limits, and selling the NFT mid-payout ends the agent's access |
@@ -509,10 +509,14 @@ pnpm --filter @accountkit/sdk build
 ### 1. Unit tests (offline)
 
 ```bash
-pnpm --filter @accountkit/sdk test
+pnpm test
 ```
 
-→ **16 passed, 4 skipped.** The skipped ones are the live tests, which need `LIVE=1`. The tests cover Borsh and NEP-641 hashing (including the standard's own example), a sign-in round trip, verification refusing tampered records, and the transaction shapes.
+→ **SDK: 79 passed, 4 skipped. API: 26 passed.** The skipped ones are the live tests, which need `LIVE=1`.
+- The SDK tests cover Borsh and NEP-641 hashing (including the standard's own example), sign-in requests and round trips, each of the 13 checks failing on its own, `prepareTransfer` and its nine refusals, spend-grant validation, renting, NEAR amounts, and RPC failover with a mocked network.
+- The API tests cover session cookies (forgery, expiry, malformed input), the cross-site check, request bodies and rate limiting.
+
+`pnpm lint` runs Biome. `pnpm --filter @accountkit/sdk test:coverage` reports coverage.
 
 ### 2. Verify a real mainnet name (read-only, about 10 seconds)
 
@@ -716,7 +720,7 @@ The SDK depends only on `@noble/curves`, `@noble/hashes` and `@scure/base`. It w
 | Live run in the browser | **Real testnet transactions, signed by the demo server** for test accounts whose keys it holds locally. `demo:bootstrap` creates those for you. |
 | Agent | **Scripted, not AI.** Each task is a fixed payment. The enforcement is real: the refusals come from the wallet contract, with its own error messages. |
 | Browser wallet flow | Built and compiled. At the time of writing, no person has yet clicked through it end to end; the same steps are covered by the scripts. |
-| History view per membership | Not built. There is no indexer. |
+| History view per membership | **Linked, not built.** Each membership card links to its account history on NearBlocks; there is no indexer of our own. |
 | Mainnet writes | Out of scope. This project never writes to mainnet. |
 
 ---
@@ -727,14 +731,18 @@ The SDK depends only on `@noble/curves`, `@noble/hashes` and `@scure/base`. It w
 - **The API listens on 127.0.0.1 by default** (`HOST` changes it) and **refuses cross-site POSTs** (`ALLOWED_ORIGINS` adds trusted origins). A web page on another site can't make it sign or log anyone in.
 - **Sign-in challenges are single-use** and expire after 5 minutes. Sessions are HMAC-signed cookies (`HttpOnly`, `SameSite=Lax`) that last 1 hour. Ownership is re-read on every members-only request, whatever the cookie says.
 - **Transfers to accounts that don't exist are refused** before anything is signed.
-- **The live run is for demos.** It signs with test accounts; real users always sign in their own wallet.
+- **Rate limits:** 30 sign-in requests a minute and 6 live runs per 10 minutes per IP. Outstanding challenges are capped at 5,000.
+- **Every response** carries `nosniff`, `DENY` framing and `no-referrer` headers. Malformed or oversized bodies get 400 or 413, never a 500.
+- **The live run is for demos.** It signs with test accounts, stops after 3 minutes if RPC hangs, and real users always sign in their own wallet.
+
+All settings are listed in [`apps/clubhouse/.env.example`](apps/clubhouse/.env.example). `GET /api/health` reports RPC reachability and whether the demo keys are present. See [SECURITY.md](SECURITY.md) for the full policy.
 
 ---
 
 ## Limitations and next steps
 
 - **Wallet path:** built, but not yet exercised by a person (see above).
-- **No history view** per membership: it needs an indexer. The explorer already shows each account's transactions.
+- **No history view of our own** per membership: it would need an indexer. Each membership links to its history on NearBlocks instead.
 - **Not on npm yet.** For now, use it from this workspace.
 - **Testnet namespace:** creating a mainnet namespace needs House of Stake's council. AccountKit already reads mainnet names, and its write paths are the same contract calls.
 - **Renting on our testnet copy works until about 11 Dec 2026.** The price feed's staleness window was extended to 30 days ([DEPLOYMENT.md](DEPLOYMENT.md)).
@@ -749,14 +757,22 @@ packages/sdk          @accountkit/sdk: TypeScript, ESM, no dependencies beyond @
   src/auth.ts         NEP-413 and NEP-641 sign-in
   src/verify.ts       the 13 checks
   src/actions.ts      transaction builders (transfer, rent, extensions, spend grants)
+  src/names.ts        account-id and name parsing
+  src/units.ts        parseNear / formatNear
+  src/rpc.ts          JSON-RPC client with endpoint failover
   test/               unit tests, plus live tests gated by LIVE=1
+  examples/           resolve and transfer dry-run (read-only)
 apps/clubhouse        the demo app
   src/                React + Vite web app (pages, demo tabs, wallet connection)
   server/             Node API: challenges, sessions, the members gate, the live run, the agent
-  scripts/            demo:bootstrap and the e2e scripts
+  server/test/        API unit tests
+  scripts/            demo:bootstrap, demo:status and the e2e scripts
+brand/                logo, icon and banner (SVG and PNG)
 vendor/               House of Stake's tla-contracts (not committed; clone at d85860a to rebuild)
 DEPLOYMENT.md         our testnet deployment, settings and transaction evidence
 FEASIBILITY.md        what we checked before building, and why testnet
+SECURITY.md           security policy and what each property relies on
+CHANGELOG.md          what changed, by version
 ```
 
 ---
@@ -768,7 +784,7 @@ FEASIBILITY.md        what we checked before building, and why testnet
 - **Standards:** [NEP-171](https://github.com/near/NEPs/blob/master/neps/nep-0171.md) (NFTs), [NEP-413](https://github.com/near/NEPs/blob/master/neps/nep-0413.md) (signed messages), [NEP-641](https://github.com/near/NEPs/blob/master/neps/nep-0641.md) (account-level authorization, Final v1.0.0).
 - **SDK dependencies:** `@noble/curves` 2.0.1, `@noble/hashes` 2.0.1, `@scure/base` 2.0.0.
 - **App:** React 19.2, Vite 7.1, `motion` 14.6, `lenis` 1.3, NEAR Wallet Selector 10.1.4 (Meteor, Intear, HERE and Sender modules), `near-api-js` 6.5.1 (browser) and 7.3.1 (server-side test signing).
-- **Tooling:** TypeScript 5.9, Vitest, tsx, concurrently, pnpm.
+- **Tooling:** TypeScript 5.9, Vitest (with V8 coverage), Biome, tsx, concurrently, pnpm, GitHub Actions.
 - **Network:** public NEAR RPC (FastNEAR, with fallbacks) and the NEAR testnet faucet.
 
 All code in this repository was written during the hackathon window (first commit 11 Nov 2026).
