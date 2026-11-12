@@ -104,7 +104,12 @@ export function LiveRun({ status, onStatus }: { status: DemoStatus | null; onSta
               role="radio"
               aria-checked={kind === k}
               className={`run-option ${kind === k ? "selected" : ""}`}
-              onClick={() => !running && (setKind(k), setEvents([]), setError(null))}
+              onClick={() => {
+                if (running) return;
+                setKind(k);
+                setEvents([]);
+                setError(null);
+              }}
               disabled={running}
             >
               <span className="run-icon">{INFO[k].icon}</span>
