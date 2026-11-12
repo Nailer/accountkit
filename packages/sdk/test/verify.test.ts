@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseTlaName } from "../src/kit.js";
+import { parseTlaName } from "../src/names.js";
 import { fixture } from "./fixture.js";
 import { verifyItem } from "../src/verify.js";
 import { transferTx, grantSpendTx, executeTx, nearTransfer } from "../src/actions.js";

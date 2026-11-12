@@ -1,4 +1,5 @@
 import { AccountKitError } from "./errors.js";
+import { isValidAccountId, parseTlaName } from "./names.js";
 import { NearRpc, type BlockRef } from "./rpc.js";
 import type {
   AgentStatus,
@@ -36,22 +37,6 @@ export const DEFAULT_RPC: Record<string, string[]> = {
 
 /** House of Stake's live mainnet deployment, read from the `bid` registrar's config on 11 Nov 2026. */
 export const MAINNET_REGISTRY = "registry.hos";
-
-const ACCOUNT_ID_RE = /^(([a-z\d]+[-_])*[a-z\d]+\.)*([a-z\d]+[-_])*[a-z\d]+$/;
-
-export function isValidAccountId(id: string): boolean {
-  return id.length >= 2 && id.length <= 64 && ACCOUNT_ID_RE.test(id);
-}
-
-/** Splits `alice.club.testnet` into the label `alice` and the TLA `club.testnet`. */
-export function parseTlaName(name: string): { label: string; tlaId: string } {
-  const trimmed = name.trim().toLowerCase();
-  const dot = trimmed.indexOf(".");
-  if (!isValidAccountId(trimmed) || dot <= 0 || dot === trimmed.length - 1) {
-    throw new AccountKitError("INVALID_NAME", `"${name}" is not a leased name of the form label.tla`);
-  }
-  return { label: trimmed.slice(0, dot), tlaId: trimmed.slice(dot + 1) };
-}
 
 async function orNull<T>(p: Promise<T>): Promise<T | null> {
   try {

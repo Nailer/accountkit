@@ -1,4 +1,5 @@
-export { AccountKit, DEFAULT_RPC, MAINNET_REGISTRY, isValidAccountId, parseTlaName } from "./kit.js";
+export { AccountKit, DEFAULT_RPC, MAINNET_REGISTRY } from "./kit.js";
+export { isValidAccountId, parseTlaName } from "./names.js";
 export type { AccountKitConfig, NetworkId } from "./kit.js";
 export { verifyItem } from "./verify.js";
 export type { VerifyCheck, VerifyResult } from "./verify.js";
