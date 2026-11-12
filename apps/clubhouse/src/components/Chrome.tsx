@@ -24,6 +24,13 @@ export function Nav({ network }: { network: string }) {
   }, []);
   // biome-ignore lint/correctness/useExhaustiveDependencies: close the mobile menu whenever the route changes
   useEffect(() => setOpen(false), [path]);
+  // Escape closes the mobile menu, as users expect of any overlay.
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open]);
 
   return (
     <>
