@@ -198,6 +198,10 @@ export class AccountKit {
     const to = receiverId.trim().toLowerCase();
     if (!isValidAccountId(to)) throw new AccountKitError("INVALID_NAME", `"${receiverId}" is not a valid NEAR account id`);
     if (to === from) throw new AccountKitError("WRONG_OWNER", `${to} already owns ${info.name}`);
+    // The wallet refuses these on chain (SELF_TARGET / UNAUTHORIZED); refuse before the owner signs and pays gas.
+    if (to === info.name || to === info.registry || to === info.lease.authority) {
+      throw new AccountKitError("INVALID_NAME", `${to} can't own ${info.name}: it is the account itself, its registry or its lease authority`);
+    }
     try {
       await this.rpc.viewAccount(to);
     } catch (e) {
