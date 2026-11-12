@@ -14,6 +14,7 @@
  *   HOST        interface to listen on (default 127.0.0.1: this machine only)
  *   ALLOWED_ORIGINS  extra browser origins allowed to POST, comma-separated
  *   SESSION_SECRET   32+ characters; keeps sign-ins valid across restarts (default: random per process)
+ *   COOKIE_SECURE    1 to mark the session cookie Secure (when served over HTTPS)
  */
 import { randomBytes } from "node:crypto";
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
@@ -73,6 +74,7 @@ const SECRET = process.env.SESSION_SECRET && process.env.SESSION_SECRET.length >
 if (process.env.SESSION_SECRET && process.env.SESSION_SECRET.length < 32) console.warn("SESSION_SECRET is shorter than 32 characters; using a random secret instead");
 const CHALLENGE_TTL_MS = 5 * 60_000;
 const SESSION_TTL_MS = 60 * 60_000;
+const COOKIE_FLAGS = `HttpOnly; SameSite=Lax; Path=/${process.env.COOKIE_SECURE === "1" ? "; Secure" : ""}`;
 
 /* ---------- one-time challenges ---------- */
 
@@ -230,12 +232,12 @@ async function route(req: IncomingMessage, res: ServerResponse) {
     if (!result.ok) return send(res, 403, result);
     const cookie = encodeSession({ tla: ch.tla, owner: result.owner!, exp: Date.now() + SESSION_TTL_MS });
     return send(res, 200, result, {
-      "set-cookie": `ck_session=${cookie}; HttpOnly; SameSite=Lax; Path=/; Max-Age=${SESSION_TTL_MS / 1000}`,
+      "set-cookie": `ck_session=${cookie}; ${COOKIE_FLAGS}; Max-Age=${SESSION_TTL_MS / 1000}`,
     });
   }
 
   if (req.method === "POST" && path === "/api/logout") {
-    return send(res, 200, { ok: true }, { "set-cookie": "ck_session=; HttpOnly; SameSite=Lax; Path=/; Max-Age=0" });
+    return send(res, 200, { ok: true }, { "set-cookie": `ck_session=; ${COOKIE_FLAGS}; Max-Age=0` });
   }
 
   // The members-only page's data.
