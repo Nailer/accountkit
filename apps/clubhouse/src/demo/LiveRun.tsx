@@ -1,11 +1,12 @@
 import { AnimatePresence, motion } from "motion/react";
+import { copyText } from "../lib/copy";
 import { explorerTx } from "../lib/explorer";
 import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { api, runDemo, type DemoEvent, type DemoStatus, type Membership } from "../api";
 import { MembershipPass } from "../components/MembershipPass";
 import { Alert, Button, ErrorAlert, Pill, Spinner } from "../components/primitives";
 import { useToast } from "../components/toast";
-import { BotIcon, CheckIcon, ExternalIcon, PlayIcon, RefreshIcon, SwapIcon, XIcon } from "../icons";
+import { BotIcon, CheckIcon, CopyIcon, ExternalIcon, PlayIcon, RefreshIcon, SwapIcon, XIcon } from "../icons";
 
 type Kind = "ownership" | "agent";
 
@@ -94,6 +95,20 @@ export function LiveRun({ status, onStatus }: { status: DemoStatus | null; onSta
     }
   };
 
+  /** Plain-text record of the run, with full transaction links, for notes, issues or a judge's report. */
+  const copyLog = async () => {
+    const lines = steps
+      .filter((s) => s.step !== "done")
+      .map((s) => `${s.status.toUpperCase().padEnd(8)} ${s.title}${s.detail ? ` (${s.detail})` : ""}${s.tx ? `\n         ${explorer(s.tx)}` : ""}`);
+    const text = [`Clubhouse live run: ${INFO[kind].title}, NEAR testnet, ${new Date().toISOString()}`, ...lines].join("\n");
+    try {
+      await copyText(text);
+      toast("ok", "Run log copied, with transaction links");
+    } catch {
+      toast("bad", "Couldn't copy. Select the steps and copy them manually.");
+    }
+  };
+
   return (
     <div className="live">
       <div className="live-main">
@@ -139,6 +154,11 @@ export function LiveRun({ status, onStatus }: { status: DemoStatus | null; onSta
               <h3>{INFO[kind].title}</h3>
             </div>
             <div className="console-actions">
+              {finished && !running && steps.length > 0 && (
+                <Button variant="ghost" size="sm" onClick={copyLog} icon={<CopyIcon />}>
+                  Copy log
+                </Button>
+              )}
               {!running && (
                 <Button onClick={start} disabled={!available} icon={finished ? <RefreshIcon width={18} height={18} /> : <PlayIcon width={18} height={18} />}>
                   {finished ? "Run it again" : "Start the live run"}
