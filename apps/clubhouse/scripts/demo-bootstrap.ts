@@ -71,18 +71,30 @@ function saveKey(accountId: string, kp: KeyPair) {
   writeFileSync(file, `${JSON.stringify(body, null, 2)}\n`, { mode: 0o600 });
 }
 
+/** Asks the public faucet to create the account. Retries rate limits and server errors with backoff. */
 async function viaFaucet(accountId: string, publicKey: string): Promise<string | null> {
-  try {
-    const res = await fetch(FAUCET, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ newAccountId: accountId, newAccountPublicKey: publicKey }),
-    });
-    if (res.ok) return null;
-    return `faucet answered ${res.status} ${(await res.text()).slice(0, 120)}`;
-  } catch (e) {
-    return `faucet unreachable: ${(e as Error).message}`;
+  let last = "";
+  for (const wait of [0, 5_000, 15_000]) {
+    if (wait) {
+      console.log(`  ${last}; retrying in ${wait / 1000} s`);
+      await sleep(wait);
+    }
+    try {
+      const res = await fetch(FAUCET, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ newAccountId: accountId, newAccountPublicKey: publicKey }),
+        signal: AbortSignal.timeout(30_000),
+      });
+      if (res.ok) return null;
+      last = `faucet answered ${res.status} ${(await res.text()).slice(0, 120)}`;
+      if (res.status !== 429 && res.status < 500) return last; // a 4xx other than 429 won't change on retry
+    } catch (e) {
+      last = `faucet unreachable: ${(e as Error).message}`;
+    }
+    if (await exists(accountId)) return null; // the request landed even though the reply failed
   }
+  return last;
 }
 
 /** Fallback: an existing account creates the new one through the `testnet` registrar contract. */
