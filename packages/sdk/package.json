@@ -3,8 +3,29 @@
   "version": "0.1.0",
   "private": true,
   "description": "Read, verify, sign in with and operate House of Stake Top Level Accounts (TLAs) on NEAR.",
+  "keywords": [
+    "near",
+    "near-protocol",
+    "house-of-stake",
+    "top-level-accounts",
+    "nft",
+    "nep-171",
+    "nep-413",
+    "nep-641",
+    "sdk"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Nailer/accountkit.git",
+    "directory": "packages/sdk"
+  },
+  "homepage": "https://github.com/Nailer/accountkit#readme",
   "license": "MIT",
   "type": "module",
+  "sideEffects": false,
+  "engines": {
+    "node": ">=20.12"
+  },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
@@ -13,7 +34,10 @@
       "import": "./dist/index.js"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
