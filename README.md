@@ -1,3 +1,10 @@
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="brand/accountkit-logo-dark.svg">
+    <img src="brand/accountkit-logo-light.svg" alt="AccountKit" width="360">
+  </picture>
+</p>
+
 # AccountKit
 
 **AccountKit is a TypeScript SDK for House of Stake's Top Level Accounts (TLAs) on NEAR: NFTs that are also real NEAR accounts. Clubhouse is a members-only app built on it, where your membership is one of these accounts.**
@@ -61,6 +68,7 @@ Details for each step are in [Try it](#try-it). Sample output from a fresh copy 
 12. [Repository layout](#repository-layout)
 13. [Built with](#built-with)
 14. [Tracks](#tracks)
+15. [Brand assets](#brand-assets)
 
 ---
 
@@ -773,6 +781,22 @@ All code in this repository was written during the hackathon window (first commi
 - **`security`, AI Security & Defense.** An agent gets money without the keys to everything. Its budget, expiry and approved receivers are enforced by the account's contract. `e2e:attack` shows a hijacked agent being stopped on chain, with the log. We explain above why a function-call key can't be used here, and what contains the agent instead.
 
 We don't claim `agents`, `defi`, `social`, `games` or `open`.
+
+---
+
+## Brand assets
+
+The logo is an account (rounded square) bound to a token (circle): the NFT and the account are one thing. The text is converted to outlines, so the files look the same everywhere.
+
+| File | Use |
+|---|---|
+| [`brand/accountkit-logo-light.svg`](brand/accountkit-logo-light.svg) / [`.png`](brand/accountkit-logo-light.png) | Logo on light backgrounds |
+| [`brand/accountkit-logo-dark.svg`](brand/accountkit-logo-dark.svg) / [`.png`](brand/accountkit-logo-dark.png) | Logo on dark backgrounds |
+| [`brand/accountkit-mark.svg`](brand/accountkit-mark.svg) / [`-512.png`](brand/accountkit-mark-512.png) | The mark alone, as an app icon or favicon |
+| [`brand/accountkit-square-1024.png`](brand/accountkit-square-1024.png) | Square avatar |
+| [`brand/accountkit-banner-1200x630.png`](brand/accountkit-banner-1200x630.png) (and a `2400x1260` version) | Submission, social posts and link previews |
+
+The app uses `apps/clubhouse/public/favicon.svg`, `favicon.ico`, `apple-touch-icon.png` and `og-image.png`. Colours: ink `#0F0E0B`, NEAR green `#00EC97`, paper `#F3EFE6`. Typeface: Bricolage Grotesque.
 
 ---
 
