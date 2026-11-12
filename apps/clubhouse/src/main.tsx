@@ -61,6 +61,16 @@ function Shell() {
   // biome-ignore lint/correctness/useExhaustiveDependencies: boot is stable (useCallback with no deps); run it once
   useEffect(boot, [boot]);
 
+  // A distinct title per page, for tabs, history and screen readers.
+  useEffect(() => {
+    const titles: Record<string, string> = {
+      "/": "AccountKit · NEAR accounts you can hand over",
+      "/demo": "Live demo · AccountKit",
+      "/developers": "Developers · AccountKit",
+    };
+    document.title = titles[path] ?? "Page not found · AccountKit";
+  }, [path]);
+
   // New page: start at the top, or at the requested section.
   // biome-ignore lint/correctness/useExhaustiveDependencies: only on page changes; same-page hash links scroll in the router
   useEffect(() => {
