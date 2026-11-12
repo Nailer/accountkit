@@ -70,16 +70,17 @@ describe("transaction builders", () => {
   });
 
   it("builds a spend grant with nanosecond expiry", () => {
+    const expiresAt = new Date(Date.now() + 86_400_000);
     const tx = grantSpendTx("alice.club.testnet", {
       extension: "agent.testnet",
       receivers: ["shop.testnet"],
       budgetYocto: 5n * 10n ** 24n,
-      expiresAt: new Date("2026-11-20T00:00:00Z"),
+      expiresAt,
     });
     expect(tx.actions[0]!.params.args).toMatchObject({
       extension: "agent.testnet",
       budget_yocto: "5000000000000000000000000",
-      expires_at: (BigInt(Date.parse("2026-11-20T00:00:00Z")) * 1_000_000n).toString(),
+      expires_at: (BigInt(expiresAt.getTime()) * 1_000_000n).toString(),
       tokens: [],
       items: [],
     });

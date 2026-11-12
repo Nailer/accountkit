@@ -1,4 +1,6 @@
 import { base64 } from "@scure/base";
+import { AccountKitError } from "./errors.js";
+import { isValidAccountId } from "./names.js";
 import type { TlaInfo } from "./types.js";
 
 /**
@@ -135,6 +137,7 @@ export interface SpendGrantInput {
  * Re-granting raises ceilings without resetting what was spent; revoke to reset.
  */
 export function grantSpendTx(tla: string, g: SpendGrantInput): WalletTransaction {
+  assertGrant(tla, g);
   return call(
     tla,
     "hos_grant_spend",
@@ -148,6 +151,30 @@ export function grantSpendTx(tla: string, g: SpendGrantInput): WalletTransaction
     },
     40n,
   );
+}
+
+/** Catches grants the wallet would refuse, before the owner signs (see hos-wallet assert_grantable). */
+function assertGrant(tla: string, g: SpendGrantInput): void {
+  const bad = (why: string) => {
+    throw new AccountKitError("INVALID_INPUT", `spend grant for ${g.extension} on ${tla}: ${why}`);
+  };
+  if (!isValidAccountId(g.extension)) bad(`"${g.extension}" is not a valid account id`);
+  if (g.extension === tla) bad("the account can't be its own extension");
+  if (g.receivers.length === 0) bad("name at least one receiver");
+  for (const r of g.receivers) {
+    if (!isValidAccountId(r)) bad(`receiver "${r}" is not a valid account id`);
+    if (r === tla) bad("a grant can't name the account itself as a receiver");
+  }
+  if (new Set(g.receivers).size !== g.receivers.length) bad("a receiver is listed twice");
+  let budget: bigint;
+  try {
+    budget = BigInt(g.budgetYocto);
+  } catch {
+    return bad(`budget "${g.budgetYocto}" is not a whole number of yoctoNEAR`);
+  }
+  if (budget < 0n) bad("the budget can't be negative");
+  if (Number.isNaN(g.expiresAt.getTime())) bad("the expiry is not a valid date");
+  if (g.expiresAt.getTime() <= Date.now()) bad("the expiry is in the past");
 }
 
 export function revokeSpendTx(tla: string, extension: string): WalletTransaction {

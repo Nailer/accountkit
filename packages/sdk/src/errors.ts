@@ -7,7 +7,8 @@ export type AccountKitErrorCode =
   | "WRONG_OWNER" // the caller is not the current owner
   | "RPC_UNAVAILABLE" // no RPC endpoint answered
   | "CONTRACT_PANIC" // a view or call reached the contract and the contract refused it
-  | "AUTH_INVALID"; // an NEP-641 authorization did not resolve
+  | "AUTH_INVALID" // an NEP-641 authorization did not resolve
+  | "INVALID_INPUT"; // an argument would be refused on chain (caught before anything is signed)
 
 export class AccountKitError extends Error {
   readonly code: AccountKitErrorCode;
