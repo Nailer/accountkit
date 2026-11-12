@@ -1,4 +1,5 @@
 import { AccountKit, buildAuthorization, type WalletTransaction } from "@accountkit/sdk";
+import { explorerTx } from "../lib/explorer";
 import { AnimatePresence, motion } from "motion/react";
 import { useCallback, useEffect, useMemo, useState, type FormEvent, type ReactNode } from "react";
 import { AgentPanel } from "../AgentPanel";
@@ -10,7 +11,6 @@ import { connect, currentWallet, disconnect, signAndSend, signMessage, WALLETS }
 import { MembershipDetail } from "./MembershipDetail";
 
 const decodeBase64 = (b64: string) => Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
-const explorerTx = (network: string, hash: string) => `https://${network === "mainnet" ? "" : "testnet."}nearblocks.io/txns/${hash}`;
 
 /** `*.near` accounts can't sign on testnet and vice versa. Implicit (hex) ids work on both. */
 function networkMismatch(network: string, accountId: string): boolean {

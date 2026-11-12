@@ -1,4 +1,5 @@
 import { addExtensionTx, grantSpendTx, revokeSpendTx } from "@accountkit/sdk";
+import { explorerTx } from "./lib/explorer";
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { agentApi, formatNear, type AgentAttempt, type AgentInfo } from "./api";
 import { BotIcon, CheckIcon, ExternalIcon, PlusIcon, XIcon } from "./icons";
@@ -34,7 +35,7 @@ export function AgentPanel(props: { network: string; tla: string; balanceYocto: 
   const g = info.status.grant;
   const busy = busyKey !== null;
   const is = (k: string) => busyKey === k;
-  const explorer = (h: string) => `https://${network === "mainnet" ? "" : "testnet."}nearblocks.io/txns/${h}`;
+  const explorer = (h: string) => explorerTx(network, h);
   const budgetValid = /^\d+(\.\d{1,6})?$/.test(budget) && Number(budget) > 0;
   const hoursValid = /^\d+$/.test(hours) && Number(hours) > 0;
 

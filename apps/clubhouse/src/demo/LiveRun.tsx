@@ -1,4 +1,5 @@
 import { AnimatePresence, motion } from "motion/react";
+import { explorerTx } from "../lib/explorer";
 import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { api, runDemo, type DemoEvent, type DemoStatus, type Membership } from "../api";
 import { MembershipPass } from "../components/MembershipPass";
@@ -25,7 +26,7 @@ const INFO: Record<Kind, { title: string; icon: ReactNode; text: string; sees: s
   },
 };
 
-const explorer = (h: string) => `https://testnet.nearblocks.io/txns/${h}`;
+const explorer = (h: string) => explorerTx("testnet", h);
 
 function StatusIcon({ s }: { s: DemoEvent["status"] }) {
   if (s === "running") return <Spinner />;
