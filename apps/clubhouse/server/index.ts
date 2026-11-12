@@ -106,8 +106,16 @@ const readSession = (req: IncomingMessage) => sessions.read(req.headers.cookie);
 
 /* ---------- helpers ---------- */
 
+/** Sent with every API response: JSON only, never framed, no referrer leaks. */
+const SECURITY_HEADERS = {
+  "x-content-type-options": "nosniff",
+  "x-frame-options": "DENY",
+  "referrer-policy": "no-referrer",
+  "cross-origin-resource-policy": "same-origin",
+};
+
 function send(res: ServerResponse, status: number, body: unknown, headers: Record<string, string> = {}) {
-  res.writeHead(status, { "content-type": "application/json", "cache-control": "no-store", ...headers });
+  res.writeHead(status, { ...SECURITY_HEADERS, "content-type": "application/json", "cache-control": "no-store", ...headers });
   res.end(JSON.stringify(body, (_k, v) => (typeof v === "bigint" ? v.toString() : v)));
 }
 
@@ -270,7 +278,7 @@ async function route(req: IncomingMessage, res: ServerResponse) {
     if (!(which === "agent" ? a.agent : a.ownership)) return send(res, 503, { error: "the demo accounts' testnet keys are not on this server", missing: a.missing });
     if (demoRunning) return send(res, 409, { error: `a ${demoRunning} run is already in progress; wait for it to finish` });
     demoRunning = which;
-    res.writeHead(200, { "content-type": "text/event-stream", "cache-control": "no-store", connection: "keep-alive" });
+    res.writeHead(200, { ...SECURITY_HEADERS, "content-type": "text/event-stream", "cache-control": "no-store", connection: "keep-alive" });
     const emit = (e: DemoEvent) => res.write(`data: ${JSON.stringify({ ...e, at: new Date().toISOString() })}\n\n`);
     try {
       await (which === "agent" ? runAgent(kit, DEMO, emit) : runOwnership(kit, DEMO, emit));
