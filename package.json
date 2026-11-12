@@ -20,6 +20,7 @@
     "e2e:server": "pnpm --filter clubhouse exec tsx scripts/e2e-server.ts",
     "e2e:agent": "pnpm --filter clubhouse exec tsx scripts/e2e-agent.ts",
     "e2e:attack": "pnpm --filter clubhouse exec tsx scripts/e2e-attack.ts",
+    "e2e:all": "pnpm demo:status && pnpm e2e:transfer && pnpm e2e:agent && pnpm e2e:attack",
     "lint": "biome lint ."
   },
   "pnpm": {
