@@ -24,8 +24,8 @@ jobs:
         run: pnpm lint
       - name: Build the SDK
         run: pnpm --filter @accountkit/sdk build
-      - name: Unit tests
-        run: pnpm --filter @accountkit/sdk test
+      - name: Unit tests (SDK and API)
+        run: pnpm test
       - name: Typecheck
         run: pnpm typecheck
       - name: Build the web app
