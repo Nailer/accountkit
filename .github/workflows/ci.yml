@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches: [main, hardening]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Build the SDK
+        run: pnpm --filter @accountkit/sdk build
+      - name: Unit tests
+        run: pnpm --filter @accountkit/sdk test
+      - name: Typecheck
+        run: pnpm typecheck
+      - name: Build the web app
+        run: pnpm --filter clubhouse build
+
+  live-mainnet-read:
+    # Reads a real House of Stake name from mainnet. Read-only, no keys.
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: check
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @accountkit/sdk build
+      - run: pnpm test:live
