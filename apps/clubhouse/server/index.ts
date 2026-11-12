@@ -203,7 +203,8 @@ async function route(req: IncomingMessage, res: ServerResponse) {
 
   // Which club memberships does this account hold?
   if (req.method === "GET" && path === "/api/names") {
-    const owner = url.searchParams.get("owner") ?? "";
+    const owner = url.searchParams.get("owner")?.trim() ?? "";
+    if (!owner) return send(res, 400, { error: "owner is required, e.g. /api/names?owner=alice.testnet", code: "INVALID_NAME" });
     const registry = url.searchParams.get("registry") ?? undefined;
     let names: string[] = [];
     if (registry || CLUB_TLA || kit.network === "mainnet") {
