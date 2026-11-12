@@ -155,7 +155,8 @@ export function grantSpendTx(tla: string, g: SpendGrantInput): WalletTransaction
 
 /** Catches grants the wallet would refuse, before the owner signs (see hos-wallet assert_grantable). */
 function assertGrant(tla: string, g: SpendGrantInput): void {
-  const bad = (why: string) => {
+  // Typed as returning never, so TypeScript knows nothing runs after a failed check.
+  const bad: (why: string) => never = (why) => {
     throw new AccountKitError("INVALID_INPUT", `spend grant for ${g.extension} on ${tla}: ${why}`);
   };
   if (!isValidAccountId(g.extension)) bad(`"${g.extension}" is not a valid account id`);
@@ -170,7 +171,7 @@ function assertGrant(tla: string, g: SpendGrantInput): void {
   try {
     budget = BigInt(g.budgetYocto);
   } catch {
-    return bad(`budget "${g.budgetYocto}" is not a whole number of yoctoNEAR`);
+    bad(`budget "${g.budgetYocto}" is not a whole number of yoctoNEAR`);
   }
   if (budget < 0n) bad("the budget can't be negative");
   if (Number.isNaN(g.expiresAt.getTime())) bad("the expiry is not a valid date");
