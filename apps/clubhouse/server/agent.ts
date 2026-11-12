@@ -8,7 +8,7 @@
  * can only reach the membership account through `w_execute_extension`, which
  * the wallet checks against the owner's grant. It never sees the owner's key.
  */
-import { executeTx, nearTransfer, type AccountKit } from "@accountkit/sdk";
+import { executeTx, nearTransfer, parseNear, type AccountKit } from "@accountkit/sdk";
 import { sendTx, testAccount, type SentTx } from "./signer.js";
 
 export interface Proposal {
@@ -36,11 +36,9 @@ export const DEMO_TASKS = [
 
 export type TaskId = (typeof DEMO_TASKS)[number]["id"];
 
-const YOCTO_PER_NEAR = 10n ** 24n;
-
+/** "0.2" -> yoctoNEAR. Delegates to the SDK's strict parser. */
 export function toYocto(near: string): bigint {
-  const [w = "0", f = ""] = near.split(".");
-  return BigInt(w) * YOCTO_PER_NEAR + BigInt((f + "0".repeat(24)).slice(0, 24));
+  return parseNear(near);
 }
 
 /** Deterministic proposal: the task fixes recipient and amount. No model involved. */
