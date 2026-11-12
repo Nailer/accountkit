@@ -1,6 +1,7 @@
 import { formatNear, formatNs, type Membership } from "../api";
 import { Pill } from "../components/primitives";
-import { CheckIcon, XIcon } from "../icons";
+import { CheckIcon, ExternalIcon, XIcon } from "../icons";
+import { explorerAccount } from "../lib/explorer";
 
 /** The verified on-chain facts about one membership, with the 13 checks behind them. */
 export function MembershipDetail({ m, network, title = "Membership account" }: { m: Membership; network: string; title?: string }) {
@@ -38,6 +39,16 @@ export function MembershipDetail({ m, network, title = "Membership account" }: {
           ))}
         </ul>
       </details>
+      <p className="detail-links small">
+        <a className="text-link" href={explorerAccount(network, m.name)} target="_blank" rel="noreferrer">
+          Account history on NearBlocks <ExternalIcon />
+        </a>
+        {m.owner && (
+          <a className="text-link" href={explorerAccount(network, m.owner)} target="_blank" rel="noreferrer">
+            Owner's account <ExternalIcon />
+          </a>
+        )}
+      </p>
     </div>
   );
 }

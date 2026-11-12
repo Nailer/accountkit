@@ -186,3 +186,4 @@
 .result-bad .result-icon { color: var(--coral); }
 .result-title { font-weight: 650; }
 .ext-link { display: inline-flex; align-items: center; gap: 4px; color: var(--signal); }
+.detail-links { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 14px 0 0; }
