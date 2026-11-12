@@ -43,7 +43,8 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
     "test:live": "LIVE=1 vitest run test/live.test.ts",
-    "example:resolve": "tsx examples/resolve.ts"
+    "example:resolve": "tsx examples/resolve.ts",
+    "example:transfer": "tsx examples/transfer-dry-run.ts"
   },
   "dependencies": {
     "@noble/curves": "2.0.1",
