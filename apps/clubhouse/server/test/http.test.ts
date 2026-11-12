@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { HttpError, originAllowed, readJsonBody } from "../http.js";
+import { HttpError, originAllowed, rateLimiter, readJsonBody } from "../http.js";
 
 describe("originAllowed", () => {
   it("allows requests without an Origin (scripts, curl)", () => {
@@ -41,5 +41,20 @@ describe("readJsonBody", () => {
   it("refuses an oversized body with a 413", async () => {
     const err = await readJsonBody(body("x".repeat(20)), 10).catch((e) => e);
     expect(err.status).toBe(413);
+  });
+});
+
+describe("rateLimiter", () => {
+  it("allows up to the limit per window, per key", () => {
+    const allow = rateLimiter(2, 1000);
+    expect([allow("a", 0), allow("a", 10), allow("a", 20)]).toEqual([true, true, false]);
+    expect(allow("b", 20)).toBe(true);
+  });
+
+  it("starts a new window after windowMs", () => {
+    const allow = rateLimiter(1, 1000);
+    expect(allow("a", 0)).toBe(true);
+    expect(allow("a", 999)).toBe(false);
+    expect(allow("a", 1000)).toBe(true);
   });
 });

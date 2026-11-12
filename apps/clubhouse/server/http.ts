@@ -47,3 +47,21 @@ export async function readJsonBody(req: AsyncIterable<Buffer | string>, limit = 
   if (value === null || typeof value !== "object" || Array.isArray(value)) throw new HttpError(400, "request body must be a JSON object", "BAD_JSON");
   return value as Record<string, unknown>;
 }
+
+/**
+ * Fixed-window rate limit per key (an IP address here). In memory: fine for a
+ * single demo server; a multi-instance deployment would need a shared store.
+ */
+export function rateLimiter(limit: number, windowMs: number) {
+  const windows = new Map<string, { start: number; count: number }>();
+  return function allow(key: string, now = Date.now()): boolean {
+    const w = windows.get(key);
+    if (!w || now - w.start >= windowMs) {
+      if (windows.size > 10_000) windows.clear(); // bound memory under a flood of distinct keys
+      windows.set(key, { start: now, count: 1 });
+      return true;
+    }
+    w.count += 1;
+    return w.count <= limit;
+  };
+}
