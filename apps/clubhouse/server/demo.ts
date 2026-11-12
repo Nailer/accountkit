@@ -8,7 +8,7 @@
  * unavailable instead of pretending.
  */
 import {
-  AccountKit,
+  type AccountKit,
   addExtensionTx,
   buildAuthorization,
   createSignInRequest,

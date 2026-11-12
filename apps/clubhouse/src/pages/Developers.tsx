@@ -1,5 +1,5 @@
 import { motion } from "motion/react";
-import { type Config } from "../api";
+import type { Config } from "../api";
 import { CodeBlock } from "../components/CodeBlock";
 import { Reveal } from "../components/motion";
 import { Alert, ButtonLink, Pill } from "../components/primitives";
