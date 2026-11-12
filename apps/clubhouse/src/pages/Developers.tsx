@@ -40,6 +40,7 @@ const ERRORS = [
   ["RPC_UNAVAILABLE", "No RPC endpoint answered"],
   ["CONTRACT_PANIC", "The contract refused the call (message included)"],
   ["AUTH_INVALID", "An NEP-641 authorization didn't resolve"],
+  ["INVALID_INPUT", "An argument the contract would refuse, caught before signing"],
 ];
 
 const CONTRACTS = [
