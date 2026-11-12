@@ -28,6 +28,7 @@ export {
 } from "./actions.js";
 export type { WalletTransaction, WalletRequest, NearPromise, SpendGrantInput } from "./actions.js";
 export { NearRpc } from "./rpc.js";
+export { YOCTO_PER_NEAR, parseNear, formatNear } from "./units.js";
 export { AccountKitError, isAccountKitError } from "./errors.js";
 export type { AccountKitErrorCode } from "./errors.js";
 export * from "./types.js";
