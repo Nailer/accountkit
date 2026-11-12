@@ -1,7 +1,7 @@
 {
   "name": "accountkit-monorepo",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "AccountKit: a TypeScript SDK for House of Stake Top Level Accounts on NEAR, plus the Clubhouse demo app.",
   "license": "MIT",
   "packageManager": "pnpm@10.2.0",

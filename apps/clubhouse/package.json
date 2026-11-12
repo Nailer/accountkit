@@ -1,6 +1,6 @@
 {
   "name": "clubhouse",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "Clubhouse: a members-only page gated by House of Stake Top Level Account ownership, built on @accountkit/sdk.",
   "license": "MIT",
