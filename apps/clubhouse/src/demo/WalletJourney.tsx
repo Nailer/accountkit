@@ -261,7 +261,7 @@ export function WalletJourney({ config }: { config: Config }) {
                 <p className="field-hint">AccountKit checks the receiver exists before your wallet opens, so a typo can't send the membership to nobody.</p>
               </div>
               <AnimatePresence>
-                {confirmTransfer && !isBusy("transfer") && (
+                {confirmTransfer && !isBusy("transfer") && failure?.key !== "transfer" && (
                   <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}>
                     <Alert tone="warning" title={`Transfer ${m.name} to ${receiver}?`} actions={<Button size="sm" variant="ghost" type="button" onClick={() => setConfirmTransfer(false)}>Cancel</Button>}>
                       <p>This can't be undone from here. Press "Yes, transfer it", then approve in your wallet.</p>
@@ -270,6 +270,8 @@ export function WalletJourney({ config }: { config: Config }) {
                 )}
               </AnimatePresence>
               {isBusy("transfer") && <p className="progress-note"><Spinner /> {busy!.label}…</p>}
+              {/* Shown here, next to the form, so a refused receiver is seen without scrolling. */}
+              {failure?.key === "transfer" && <ErrorAlert raw={failure.raw} onRetry={failure.retry} onDismiss={() => { setFailure(null); setConfirmTransfer(false); }} />}
             </form>
           )}
         </div>
@@ -372,7 +374,7 @@ export function WalletJourney({ config }: { config: Config }) {
   return (
     <div className="wallet-journey">
       <Stepper stage={stage} />
-      {failure && <ErrorAlert raw={failure.raw} onRetry={failure.retry} onDismiss={() => setFailure(null)} />}
+      {failure && failure.key !== "transfer" && <ErrorAlert raw={failure.raw} onRetry={failure.retry} onDismiss={() => setFailure(null)} />}
       {busy && !busy.key.startsWith("enter:") && busy.key !== "transfer" && !busy.key.startsWith("connect:") && (
         <p className="progress-note"><Spinner /> {busy.label}…</p>
       )}
