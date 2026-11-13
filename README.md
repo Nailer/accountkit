@@ -836,6 +836,12 @@ The app uses `apps/clubhouse/public/favicon.svg`, `favicon.ico`, `apple-touch-ic
 
 ---
 
+## Also by the same author at NEAR HACKATHON
+
+**[NEAR Breakeven](https://github.com/Nailer/nearbreakeven)** ([live](https://nearbreakeven.vercel.app)): an investment thesis for NEAR that anyone can rebuild with one command and verify on NEAR, measuring how much of NEAR's new issuance NEAR Intents revenue already pays for. The two projects are independent: they share no runtime code, contracts or deployments.
+
+---
+
 ## License
 
 MIT. See [LICENSE](LICENSE).
