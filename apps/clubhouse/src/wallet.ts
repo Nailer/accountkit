@@ -45,9 +45,25 @@ export async function currentWallet(network: string): Promise<{ wallet: Wallet; 
   return accountId ? { wallet, accountId } : null;
 }
 
+/**
+ * Signs out of the wallet. Some wallets never answer signOut (a closed popup,
+ * a locked extension), so after 5 seconds this forgets the session locally
+ * instead of leaving the page stuck on "Disconnecting".
+ */
 export async function disconnect(network: string) {
   const w = await currentWallet(network);
-  await w?.wallet.signOut();
+  if (!w) return;
+  const answered = await Promise.race([
+    w.wallet.signOut().then(() => true, () => false),
+    new Promise<boolean>((res) => setTimeout(() => res(false), 5000)),
+  ]);
+  if (answered) return;
+  try {
+    for (const k of Object.keys(localStorage)) if (k.startsWith("near-wallet-selector:")) localStorage.removeItem(k);
+  } catch {
+    /* storage blocked: nothing stored to forget */
+  }
+  selectorPromise = null;
 }
 
 /** NEP-413 signMessage. Returns the signer's public key and base64 signature. */
