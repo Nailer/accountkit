@@ -13,7 +13,7 @@ Built at NEAR HACKATHON, 1–14 Nov 2026. Tracks: **`nfts`** (primary) and **`se
 
 | | |
 |---|---|
-| Demo video and X post | _link added before submission_ |
+| Demo video and X post | https://x.com/EmmanuelAje7/status/2121127745035895180 (1:42: the loophole, a real Meteor wallet on testnet, transactions on NearBlocks, a hijacked agent) |
 | Repository | https://github.com/Nailer/accountkit |
 | Network | NEAR **testnet** for every write. Mainnet is used read-only. No real money is involved. |
 | License | MIT |
@@ -654,6 +654,20 @@ all checks passed: the agent could not escape its budget, and the sale ended its
 ```
 
 (Transaction links are trimmed from this copy; the script prints them in full. In this run the approved receiver and the buyer happen to be the same account, because `demo:bootstrap` makes the second member the approved receiver.)
+
+### From a real browser wallet (13 Nov 2026)
+
+The wallet journey in Clubhouse (`/demo#wallet`), driven with a Meteor wallet on testnet (`itup.testnet`). This is the flow shown in the demo video.
+
+| Step | Result | Transaction |
+|---|---|---|
+| Connect Meteor | Connected as `itup.testnet` (no transaction) | |
+| Rent `itup-clubpass.akclub.testnet` | `rent_sub_account`, 1.69105 test NEAR, Success; NFT minted for `itup.testnet` | [ziTQ5HBS…](https://testnet.nearblocks.io/txns/ziTQ5HBSU1pK63akqjypURXFobPXun2JYiJbNLjFi67) |
+| Enter the members area | Signed message (NEP-413), no transaction, no gas; 13/13 checks | |
+| Transfer to `ak-ghost-7f3.testnet` (doesn't exist) | Refused by `prepareTransfer` before the wallet opened; nothing signed | |
+| Transfer to `ak-alice.testnet` | `nft_transfer`, Success; `itup.testnet` refused on its next visit | [3XNY4jTA…](https://testnet.nearblocks.io/txns/3XNY4jTAGmBir35ZDA9Qh5cB9e5fV4pFQaegibqAcdoD) |
+
+This run found two bugs, both fixed: wallet-selector 10 rejected AccountKit's action format ("Unsupported NAJ action"), and the refused-transfer message appeared out of view.
 
 ### From the original deployment
 
