@@ -9,7 +9,7 @@
 
 **AccountKit is a TypeScript SDK for House of Stake's Top Level Accounts (TLAs) on NEAR: NFTs that are also real NEAR accounts. Clubhouse is a members-only app built on it, where your membership is one of these accounts.**
 
-Built at NEAR HACKATHON, 1–14 Nov 2026. Tracks: **`nfts`** (primary) and **`security`**.
+Built at NEAR HACKATHON, 1–14 Nov 2026. Tracks: **`nfts`** (primary), **`security`**, **`agents`** and **`open`** (see [Tracks](#tracks)).
 
 | | |
 |---|---|
@@ -810,7 +810,10 @@ All code in this repository was written during the hackathon window (first commi
 - **`nfts`, NFTs That Do Something (primary).** Top Level Accounts are NFTs that are accounts: they hold money and carry membership and access rights. AccountKit is the SDK the track prompt says is missing. Clubhouse gates a page on current ownership, and the [threat model](#56-threat-model-how-a-seller-might-try-to-keep-access) explains exactly how control passes on transfer and what stops the old owner keeping access. Tests cover the transfer path, including a sale in the middle of a payout.
 - **`security`, AI Security & Defense.** An agent gets money without the keys to everything. Its budget, expiry and approved receivers are enforced by the account's contract. `e2e:attack` shows a hijacked agent being stopped on chain, with the log. We explain above why a function-call key can't be used here, and what contains the agent instead.
 
-We don't claim `agents`, `defi`, `social`, `games` or `open`.
+- **`agents`, Agent Economy.** The spending side of an agent economy: an agent pays from an account it doesn't own, inside a budget, expiry and receiver list that the account's own contract enforces (`grantSpendTx`, `agentStatus`, `revokeSpendTx`). `e2e:agent` and the Clubhouse agent panel show payments allowed and refused on chain. The demo agent is scripted, not an AI model.
+- **`open`, Open Innovation.** A developer SDK for a new kind of NEAR asset, accounts that can be bought, sold and delegated, which doesn't sit in a single category.
+
+We don't claim `defi`, `thesis`, `privacy`, `business`, `swarms`, `realworld`, `games`, `memecoins` or `social`: AccountKit doesn't do what those tracks ask (for example, `social` is built on Sputnik DAO and Trezu, which we don't use).
 
 ---
 
