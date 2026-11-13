@@ -14,6 +14,7 @@ Built at NEAR HACKATHON, 1–14 Nov 2026. Tracks: **`nfts`** (primary), **`secur
 | | |
 |---|---|
 | Demo video and X post | https://x.com/EmmanuelAje7/status/2121127745035895180 (1:42: the loophole, a real Meteor wallet on testnet, transactions on NearBlocks, a hijacked agent) |
+| Live demo | **https://accountkit.vercel.app** (Clubhouse on NEAR testnet, no install: [live run](https://accountkit.vercel.app/demo#live), [your wallet](https://accountkit.vercel.app/demo#wallet), [lookup](https://accountkit.vercel.app/demo#lookup)) |
 | Repository | https://github.com/Nailer/accountkit |
 | Network | NEAR **testnet** for every write. Mainnet is used read-only. No real money is involved. |
 | License | MIT |
@@ -22,7 +23,9 @@ Built at NEAR HACKATHON, 1–14 Nov 2026. Tracks: **`nfts`** (primary), **`secur
 
 ## For judges: the 5-minute check
 
-Each command below prints a result you can compare. Everything runs on NEAR testnet or reads mainnet. Requirements: Node 20.12+ and pnpm 10.
+**No install:** open https://accountkit.vercel.app/demo#live and press **Start the live run**. A real testnet transfer streams in step by step (about 15 seconds), each step linked on NearBlocks, and the old owner is refused at the end. `/demo#wallet` does the same journey with your own testnet wallet.
+
+To check it locally, each command below prints a result you can compare. Everything runs on NEAR testnet or reads mainnet. Requirements: Node 20.12+ and pnpm 10.
 
 ```bash
 pnpm install
@@ -31,7 +34,7 @@ pnpm --filter @accountkit/sdk build
 
 | # | Run | You should see | What it proves |
 |---|---|---|---|
-| 1 | `pnpm test` | SDK `79 passed`, `4 skipped`; API `26 passed` | Verification, sign-in, transfer and grant rules, RPC failover and the API's security checks, offline |
+| 1 | `pnpm test` | SDK `79 passed`, `4 skipped`; API `33 passed` | Verification, sign-in, transfer and grant rules, RPC failover and the API's security checks, offline |
 | 2 | `pnpm test:live` | `ibuiltthisshit.bid VERIFIED owner: dizzy123.near` and 13 `ok` lines | The SDK reads House of Stake's **live mainnet** contracts correctly |
 | 3 | `pnpm demo:bootstrap`, then `pnpm demo:status` | 3 new testnet accounts, a membership rented and `13/13 checks`; then `ready` | You get your own demo accounts. No keys from us are needed. |
 | 4 | `pnpm e2e:transfer` | 10 `PASS` lines and a NearBlocks link | Access follows the NFT: the new owner gets in and the old owner is refused |
@@ -512,7 +515,7 @@ pnpm --filter @accountkit/sdk build
 pnpm test
 ```
 
-→ **SDK: 79 passed, 4 skipped. API: 26 passed.** The skipped ones are the live tests, which need `LIVE=1`.
+→ **SDK: 79 passed, 4 skipped. API: 33 passed.** The skipped ones are the live tests, which need `LIVE=1`.
 - The SDK tests cover Borsh and NEP-641 hashing (including the standard's own example), sign-in requests and round trips, each of the 13 checks failing on its own, `prepareTransfer` and its nine refusals, spend-grant validation, renting, NEAR amounts, and RPC failover with a mocked network.
 - The API tests cover session cookies (forgery, expiry, malformed input), the cross-site check, request bodies and rate limiting.
 
@@ -586,7 +589,7 @@ cp -n apps/clubhouse/.env.example apps/clubhouse/.env   # skip if demo:bootstrap
 pnpm dev
 ```
 
-Open http://localhost:5173.
+Open http://localhost:5173, or use the hosted copy at **https://accountkit.vercel.app** (same app and API, NEAR testnet).
 
 | Page | Do this | You should see |
 |---|---|---|
@@ -733,7 +736,8 @@ The SDK depends only on `@noble/curves`, `@noble/hashes` and `@scure/base`. It w
 | Transfers, rents, agent payments and refusals | **Real testnet transactions**, with links. |
 | Live run in the browser | **Real testnet transactions, signed by the demo server** for test accounts whose keys it holds locally. `demo:bootstrap` creates those for you. |
 | Agent | **Scripted, not AI.** Each task is a fixed payment. The enforcement is real: the refusals come from the wallet contract, with its own error messages. |
-| Browser wallet flow | Built and compiled. At the time of writing, no person has yet clicked through it end to end; the same steps are covered by the scripts. |
+| Browser wallet flow | **Real, clicked through with a Meteor wallet on 13 Nov 2026** (see [Proof on chain](#proof-on-chain)). It found and fixed two bugs. |
+| Hosted demo | **Real.** https://accountkit.vercel.app runs the same app and API as a Vercel function. Its demo test keys are a secret environment variable, never in the repository. |
 | History view per membership | **Linked, not built.** Each membership card links to its account history on NearBlocks; there is no indexer of our own. |
 | Mainnet writes | Out of scope. This project never writes to mainnet. |
 
@@ -743,11 +747,11 @@ The SDK depends only on `@noble/curves`, `@noble/hashes` and `@scure/base`. It w
 
 - **No keys in the repository.** Test keys live in `~/.near-credentials` or the git-ignored `apps/clubhouse/.demo-keys/`, and are never printed.
 - **The API listens on 127.0.0.1 by default** (`HOST` changes it) and **refuses cross-site POSTs** (`ALLOWED_ORIGINS` adds trusted origins). A web page on another site can't make it sign or log anyone in.
-- **Sign-in challenges are single-use** and expire after 5 minutes. Sessions are HMAC-signed cookies (`HttpOnly`, `SameSite=Lax`) that last 1 hour. Ownership is re-read on every members-only request, whatever the cookie says.
+- **Sign-in challenges are signed tokens** (HMAC), so any server instance can check one; each is accepted once per instance and expires after 5 minutes. The signature it unlocks can only come from the owner's wallet. Sessions are HMAC-signed cookies (`HttpOnly`, `SameSite=Lax`) that last 1 hour. Ownership is re-read on every members-only request, whatever the cookie says.
 - **Transfers to accounts that don't exist are refused** before anything is signed.
-- **Rate limits:** 30 sign-in requests a minute and 6 live runs per 10 minutes per IP. Outstanding challenges are capped at 5,000.
+- **Rate limits:** 30 sign-in requests a minute and 6 live runs per 10 minutes per IP (per instance when hosted; `TRUST_PROXY=1` reads the client address from the proxy).
 - **Every response** carries `nosniff`, `DENY` framing and `no-referrer` headers. Malformed or oversized bodies get 400 or 413, never a 500.
-- **The live run is for demos.** It signs with test accounts, stops after 3 minutes if RPC hangs, and real users always sign in their own wallet.
+- **The live run is for demos.** It signs with test accounts, stops after 3 minutes if RPC hangs, and real users always sign in their own wallet. On the hosted copy anyone can start it; the worst case is that the demo accounts spend test NEAR, which has no value.
 
 All settings are listed in [`apps/clubhouse/.env.example`](apps/clubhouse/.env.example). `GET /api/health` reports RPC reachability and whether the demo keys are present. See [SECURITY.md](SECURITY.md) for the full policy.
 
@@ -755,7 +759,6 @@ All settings are listed in [`apps/clubhouse/.env.example`](apps/clubhouse/.env.e
 
 ## Limitations and next steps
 
-- **Wallet path:** built, but not yet exercised by a person (see above).
 - **No history view of our own** per membership: it would need an indexer. Each membership links to its history on NearBlocks instead.
 - **Not on npm yet.** For now, use it from this workspace.
 - **Testnet namespace:** creating a mainnet namespace needs House of Stake's council. AccountKit already reads mainnet names, and its write paths are the same contract calls.

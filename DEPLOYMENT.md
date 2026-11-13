@@ -59,3 +59,16 @@ The e2e scripts move the membership back and forth, so its current owner depends
 ## An incident worth knowing about
 
 Our first transfer went to `ak-bob.testnet` before that account existed: the faucet had rate-limited us and our script misread its output. The registry accepted it, because NEP-171 `nft_transfer` accepts any valid account id. Until the account was created, the membership belonged to whoever would create that name first. We created it with our saved key, so nothing was lost. AccountKit's `prepareTransfer()` now refuses receivers that don't exist, and the e2e test checks this.
+
+## The hosted copy (accountkit.vercel.app)
+
+https://accountkit.vercel.app runs the same web app and API as `pnpm dev`, on NEAR testnet. `apps/clubhouse/scripts/build-vercel.mjs` builds it in Vercel's Build Output format: the web app as static files, and the API (`server/vercel.ts`, which calls the same routes as `server/index.ts`) bundled with esbuild into one Node function.
+
+```bash
+cd apps/clubhouse
+pnpm build:vercel                     # writes apps/clubhouse/.vercel/output
+vercel deploy --prebuilt --prod
+```
+
+Settings are Vercel environment variables: `NETWORK=testnet`, `CLUB_TLA=akclub.testnet`, `AGENT_ACCOUNT`, `AGENT_APPROVED`, `COOKIE_SECURE=1`, `TRUST_PROXY=1`, `ALLOWED_ORIGINS=https://accountkit.vercel.app`, a random `SESSION_SECRET`, and `DEMO_KEYS`, the demo accounts' testnet keys as JSON. The keys are never in the repository or the build output.
+

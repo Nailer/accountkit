@@ -33,7 +33,7 @@ Please open a private security advisory on this repository (GitHub → Security 
 
 - Listens on `127.0.0.1` by default; refuses cross-site POSTs.
 - Per-IP rate limits on sign-in (30 a minute) and live runs (6 per 10 minutes).
-- Single-use sign-in challenges that expire after 5 minutes, capped at 5,000 outstanding.
+- Sign-in challenges are HMAC-signed tokens that expire after 5 minutes; each is accepted once per server instance.
 - HMAC-signed `HttpOnly`, `SameSite=Lax` session cookies (`Secure` with `COOKIE_SECURE=1`).
 - `nosniff`, `DENY` framing and `no-referrer` headers on every response.
 - Malformed or oversized bodies are refused with 400 or 413.
@@ -41,5 +41,5 @@ Please open a private security advisory on this repository (GitHub → Security 
 ## Known limits
 
 - The live run's server holds test keys. Don't run it with keys to accounts that hold real value.
-- Rate limits and challenges are kept in memory, so they reset on restart and aren't shared between instances.
+- Rate limits and the record of used challenges are kept in memory, so they reset on restart and aren't shared between instances (the hosted copy can run several). Within its 5 minutes, a challenge's signature could be replayed on another instance by someone who captured it; only the owner's wallet can produce it.
 - The agent's own key is full-access, because House of Stake's wallet requires a deposit on extension calls, which function-call keys can't attach. Its spending is contained by the on-chain grant (see the README).

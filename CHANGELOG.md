@@ -2,6 +2,13 @@
 
 All notable changes. Dates are UTC.
 
+## 0.2.1 (13 Nov 2026)
+
+- Clubhouse is hosted at https://accountkit.vercel.app: the same app and API, built for Vercel by `scripts/build-vercel.mjs` (`server/app.ts` holds the routes for both the local server and the hosted function).
+- Sign-in challenges are HMAC-signed tokens, so any instance can check them (7 new tests; API: 33 tests).
+- The demo accounts' testnet keys can come from a `DEMO_KEYS` secret environment variable on a host.
+- Wallet fixes from a click-through with Meteor: wallet-selector 10 action format, a hanging disconnect, and a refused transfer shown out of view.
+
 ## 0.2.0 — 12 Nov 2026
 
 ### Added

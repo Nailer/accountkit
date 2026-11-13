@@ -12,3 +12,6 @@ deployment.*.json
 # Demo test-account keys written by pnpm demo:bootstrap (testnet only)
 .demo-keys/
 coverage/
+
+# Vercel build output and project link
+.vercel/

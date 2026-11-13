@@ -10,7 +10,18 @@ import { join } from "node:path";
 import { Account, actions } from "near-api-js-v7";
 import type { WalletTransaction } from "@accountkit/sdk";
 
+/**
+ * A test account's private key. On a host with no keychain, DEMO_KEYS holds a
+ * JSON object {"account.testnet": "ed25519:..."} set as a secret environment
+ * variable (testnet demo accounts only); otherwise the local NEAR CLI keychain.
+ */
 export function loadKey(network: string, accountId: string): string {
+  if (process.env.DEMO_KEYS) {
+    const keys = JSON.parse(process.env.DEMO_KEYS) as Record<string, unknown>;
+    const key = keys[accountId];
+    if (typeof key === "string") return key;
+    throw new Error(`${accountId} is not in DEMO_KEYS`);
+  }
   const path = join(process.env.NEAR_CREDENTIALS_DIR ?? join(homedir(), ".near-credentials"), network, `${accountId}.json`);
   const raw = JSON.parse(readFileSync(path, "utf8"));
   if (typeof raw.private_key !== "string") throw new Error(`no private_key in ${path}`);
