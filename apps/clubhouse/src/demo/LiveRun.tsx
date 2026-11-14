@@ -22,7 +22,7 @@ const INFO: Record<Kind, { title: string; icon: ReactNode; text: string; sees: s
   agent: {
     title: "Agent limits",
     icon: <BotIcon />,
-    text: "The owner gives a scripted agent 0.5 test NEAR for one approved shop. The agent tries three payments; the account's contract decides.",
+    text: "The owner gives an agent 0.5 test NEAR for one approved shop. Three scripted payments, then a real AI model on NEAR AI Cloud is handed two risky bills. The account's contract decides every time.",
     sees: ["Limit stored on chain", "One payment allowed", "Two blocked by the contract", "Limit revoked"],
   },
 };

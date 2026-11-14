@@ -38,6 +38,7 @@ const ERRORS = [
   ["LEASE_EXPIRED", "Parked, frozen or past its lease"],
   ["WRONG_OWNER", "The caller isn't the current owner"],
   ["RPC_UNAVAILABLE", "No RPC endpoint answered"],
+  ["INDEXER_UNAVAILABLE", "The history indexer didn't answer or is rate-limiting"],
   ["CONTRACT_PANIC", "The contract refused the call (message included)"],
   ["AUTH_INVALID", "An NEP-641 authorization didn't resolve"],
   ["INVALID_INPUT", "An argument the contract would refuse, caught before signing"],

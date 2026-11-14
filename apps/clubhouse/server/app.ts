@@ -15,6 +15,7 @@
  *   CLUB_TLA    only names under this TLA count as memberships (optional)
  *   TRUST_PROXY      1 when behind a hosting proxy: rate limits use X-Forwarded-For
  *   DEMO_KEYS        JSON {account: private key} for the testnet demo accounts (hosting; see server/signer.ts)
+ *   NEARAI_API_KEY   optional NEAR AI Cloud key: the agent run adds a real model (server/ai-agent.ts)
  *   ALLOWED_ORIGINS  extra browser origins allowed to POST, comma-separated
  *   SESSION_SECRET   32+ characters; keeps sign-ins valid across restarts (default: random per process)
  *   COOKIE_SECURE    1 to mark the session cookie Secure (when served over HTTPS)
@@ -28,9 +29,11 @@ import {
   isValidAccountId,
   verifyItem,
   verifySignIn,
+  type TlaHistory,
   type TlaInfo,
 } from "@accountkit/sdk";
 import { DEMO_TASKS, attempt, propose, type TaskId } from "./agent.js";
+import { AI_MODEL, aiAvailable } from "./ai-agent.js";
 import { HttpError, originAllowed, rateLimiter, readJsonBody } from "./http.js";
 import { challengeCodec } from "./challenge.js";
 import { sessionCodec, type Session } from "./session.js";
@@ -70,6 +73,10 @@ let demoRunning: string | null = null;
 // Per-IP limits: sign-in endpoints and the live run, which spends the demo accounts' test NEAR.
 const signInLimit = rateLimiter(30, 60_000);
 const demoLimit = rateLimiter(6, 10 * 60_000);
+const historyLimit = rateLimiter(20, 60_000);
+// History comes from a public, keyless indexer: cache each name for a minute so visitors can't exhaust its rate limit.
+const HISTORY_TTL_MS = 60_000;
+const historyCache = new Map<string, { at: number; value: TlaHistory }>();
 // SESSION_SECRET (32+ characters) keeps sessions valid across restarts; otherwise a fresh random secret per process.
 const SECRET = process.env.SESSION_SECRET && process.env.SESSION_SECRET.length >= 32 ? new TextEncoder().encode(process.env.SESSION_SECRET) : randomBytes(32);
 if (process.env.SESSION_SECRET && process.env.SESSION_SECRET.length < 32) console.warn("SESSION_SECRET is shorter than 32 characters; using a random secret instead");
@@ -166,7 +173,7 @@ async function route(req: IncomingMessage, res: ServerResponse) {
     const started = Date.now();
     try {
       const block = await kit.rpc.block();
-      return send(res, 200, { ok: true, network: kit.network, rpc: "reachable", blockHeight: block.height, rpcMs: Date.now() - started, demo: demoAvailability(DEMO) });
+      return send(res, 200, { ok: true, network: kit.network, rpc: "reachable", blockHeight: block.height, rpcMs: Date.now() - started, demo: demoAvailability(DEMO), aiAgent: aiAvailable() ? AI_MODEL : null });
     } catch (e) {
       return send(res, 503, { ok: false, network: kit.network, rpc: "unreachable", error: (e as Error).message });
     }
@@ -180,6 +187,18 @@ async function route(req: IncomingMessage, res: ServerResponse) {
   if (req.method === "GET" && path === "/api/tla") {
     const name = url.searchParams.get("name") ?? "";
     return send(res, 200, summary(await kit.resolve(name)));
+  }
+
+  // History of a leased name: who held it, what it paid out, what it received. Read-only.
+  if (req.method === "GET" && path === "/api/history") {
+    const name = (url.searchParams.get("name") ?? "").trim().toLowerCase();
+    const hit = historyCache.get(name);
+    if (hit && Date.now() - hit.at < HISTORY_TTL_MS) return send(res, 200, { ...hit.value, cached: true });
+    if (!historyLimit(ip)) return send(res, 429, { error: "too many history requests; wait a minute", code: "RATE_LIMITED" }, { "retry-after": "60" });
+    const value = await kit.history(name, { limit: 100 });
+    if (historyCache.size > 200) historyCache.clear();
+    historyCache.set(name, { at: Date.now(), value });
+    return send(res, 200, value);
   }
 
   // Which club memberships does this account hold?
@@ -330,7 +349,7 @@ export function handle(req: IncomingMessage, res: ServerResponse) {
     if (e instanceof HttpError) return send(res, e.status, { error: e.message, code: e.code });
     if (e instanceof AccountKitError) {
       const status =
-        e.code === "RPC_UNAVAILABLE" ? 502 : e.code === "INVALID_NAME" || e.code === "INVALID_INPUT" ? 400 : e.code === "WRONG_OWNER" ? 403 : 404;
+        e.code === "RPC_UNAVAILABLE" || e.code === "INDEXER_UNAVAILABLE" ? 502 : e.code === "INVALID_NAME" || e.code === "INVALID_INPUT" ? 400 : e.code === "WRONG_OWNER" ? 403 : 404;
       return send(res, status, { error: e.message, code: e.code });
     }
     console.error(e);

@@ -464,8 +464,9 @@ function Truth() {
     { what: "A hijacked agent, stopped on chain", status: "live", note: "Testnet, pnpm e2e:attack. Paying itself, adding an accomplice or removing the owner is refused." },
     { what: "Selling ends the seller's access", status: "live", note: "Testnet. Agents and grants are cleared; spare NEAR goes back to the seller." },
     { what: "Read real mainnet names", status: "read", note: "House of Stake's live registry.hos, read-only." },
-    { what: "The demo agent's decisions", status: "scripted", note: "Fixed tasks, not an AI model. The limits it hits are real." },
-    { what: "Activity history", status: "read", note: "Linked to NearBlocks from each membership; no indexer of our own." },
+    { what: "The demo agent's first three payments", status: "scripted", note: "Fixed tasks. The limits they hit are real." },
+    { what: "A real AI agent", status: "live", note: "In the live run, a model on NEAR AI Cloud reads two risky bills. Whatever it decides is submitted on testnet, and the account's contract allows or refuses it." },
+    { what: "Membership history", status: "read", note: "Who held it, what it paid out and what it received, read by kit.history() from public receipts. Open it under any lookup result." },
     { what: "npm package, mainnet transactions", status: "not", note: "Not built for this demo." },
   ];
   const label = { live: "Live on testnet", read: "Read-only", scripted: "Scripted", not: "Not built" } as const;

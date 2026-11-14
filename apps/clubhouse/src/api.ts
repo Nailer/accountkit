@@ -1,4 +1,4 @@
-import { formatNear as formatNearAmount } from "@accountkit/sdk";
+import { formatNear as formatNearAmount, type TlaHistory } from "@accountkit/sdk";
 
 export interface Check {
   id: string;
@@ -50,6 +50,7 @@ export const api = {
   config: () => fetch("/api/config").then((r) => j<Config>(r)),
   names: (owner: string) => fetch(`/api/names?owner=${encodeURIComponent(owner)}`).then((r) => j<{ names: string[] }>(r)),
   lookup: (name: string) => fetch(`/api/tla?name=${encodeURIComponent(name)}`).then((r) => j<Membership>(r)),
+  history: (name: string) => fetch(`/api/history?name=${encodeURIComponent(name)}`).then((r) => j<TlaHistory>(r)),
   challenge: (tla: string, owner: string) =>
     fetch("/api/challenge", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ tla, owner }) }).then((r) =>
       j<{ id: string; offchainMessage: any; nep413: { message: string; recipient: string; nonce: string }; error?: string }>(r),

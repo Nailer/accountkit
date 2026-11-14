@@ -68,7 +68,7 @@ export function AgentPanel(props: { network: string; tla: string; balanceYocto: 
         <BotIcon />
       </div>
       <p className="muted">
-        <span className="mono">{info.agent}</span> is a <strong>scripted demo agent</strong>, not an AI model: each task below is a fixed payment. It can only use your
+        <span className="mono">{info.agent}</span> is a <strong>scripted demo agent</strong>: each task below is a fixed payment (the live run adds a real AI model). It can only use your
         membership account through the limits you set, and the account's own contract enforces them.
       </p>
 
