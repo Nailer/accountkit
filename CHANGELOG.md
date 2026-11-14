@@ -2,6 +2,13 @@
 
 All notable changes. Dates are UTC.
 
+## 0.3.0 (14 Nov 2026)
+
+- **History per membership.** `kit.history(name)` returns who held a name, what it paid out, what it received and which instructions its wallet refused, from the account's public receipts (NearBlocks API v3) plus archival RPC for the buyer and seller of each transfer. No indexer of our own. `classifyReceipts` is exported for apps with their own data. New error code `INDEXER_UNAVAILABLE`. 13 new SDK tests on 60 real testnet receipts (SDK: 92 tests).
+- Clubhouse: `GET /api/history?name=` (cached for a minute, rate-limited) and a History panel under every lookup result and membership.
+- **A real AI agent.** With a NEAR AI Cloud key, the agent run adds a model that reads two risky bills (a hidden instruction; a fake supplier) and submits its decisions on testnet; the wallet's grant decides. `pnpm e2e:ai`, the hosted live run, `server/ai-agent.ts`, 8 new API tests (API: 41 tests). `GET /api/health` reports the model in use.
+- `pnpm --filter @accountkit/sdk example:history <name>`.
+
 ## 0.2.1 (13 Nov 2026)
 
 - Clubhouse is hosted at https://accountkit.vercel.app: the same app and API, built for Vercel by `scripts/build-vercel.mjs` (`server/app.ts` holds the routes for both the local server and the hosted function).
