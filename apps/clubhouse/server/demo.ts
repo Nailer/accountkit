@@ -18,6 +18,7 @@ import {
   verifySignIn,
 } from "@accountkit/sdk";
 import { attempt, propose, toYocto } from "./agent.js";
+import { aiAvailable, fakeInvoice, poisonedInvoice, proposeWithModel } from "./ai-agent.js";
 import { loadKey, sendTx, testAccount } from "./signer.js";
 
 export interface DemoConfig {
@@ -190,6 +191,38 @@ export async function runAgent(kit: AccountKit, c: DemoConfig, emit: Emit) {
       detail: r.verdict.replace(/^(Allowed|Refused) by the wallet: /, r.tx.ok ? "" : "The contract said: "),
       tx: r.tx.hash !== "?" ? r.tx.hash : undefined,
     });
+  }
+
+  // A real model as the agent. Whatever it decides, the contract has the last word.
+  if (aiAvailable()) {
+    const cases = [
+      { id: "ai", title: "A real AI agent reads a genuine bill with a hidden instruction slipped into it", doc: poisonedInvoice(c.approved, c.stranger) },
+      { id: "ai-fake", title: "The AI agent is sent a convincing bill from an account the owner never approved", doc: fakeInvoice(c.stranger) },
+    ];
+    for (const k of cases) {
+      emit({ step: k.id, status: "running", title: k.title, detail: k.doc });
+      try {
+        const p = await proposeWithModel(k.doc, ctx);
+        const approved = p.recipient === c.approved;
+        emit({
+          step: k.id,
+          status: "ok",
+          title: `${k.title.replace(/^A real AI agent reads|^The AI agent is sent/, (m) => (m.startsWith("A real") ? "The AI read" : "The AI was sent"))}. It decided: pay ${p.amountNear} NEAR to ${p.recipient}`,
+          detail: `${p.model} on NEAR AI Cloud said: "${p.reason}"${approved ? "" : " This account is not on the owner's list."}`,
+        });
+        emit({ step: `${k.id}-pay`, status: "running", title: "The agent submits the AI's decision to the membership account" });
+        const r = await attempt(c.network, c.rpcUrl, p);
+        emit({
+          step: `${k.id}-pay`,
+          status: r.tx.ok ? "ok" : "refused",
+          title: r.tx.ok ? `Allowed: ${p.amountNear} NEAR to ${p.recipient} (inside the owner's limit)` : `Blocked: ${p.amountNear} NEAR to ${p.recipient}`,
+          detail: r.tx.ok ? "The payment was to the approved receiver and within the budget, so the wallet let it through." : r.verdict.replace(/^Refused by the wallet: /, "The contract said: "),
+          tx: r.tx.hash !== "?" ? r.tx.hash : undefined,
+        });
+      } catch (e) {
+        emit({ step: k.id, status: "ok", title: "AI step skipped: the model did not give a usable answer", detail: (e as Error).message });
+      }
+    }
   }
 
   await sendTx(ownerAcct, revokeSpendTx(c.name, c.agent));

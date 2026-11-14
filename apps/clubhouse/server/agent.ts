@@ -1,6 +1,7 @@
 /**
- * The demo "agent". It is a DETERMINISTIC SCRIPT, not an AI model: it turns a
- * task into a structured payment proposal with fixed rules. The point of the
+ * The demo "agent". The tasks here are a DETERMINISTIC SCRIPT: each turns into
+ * a structured payment proposal with fixed rules. (server/ai-agent.ts adds a
+ * real model on NEAR AI Cloud as a second kind of agent.) The point of the
  * demo is not the agent's judgement; it is that the TLA wallet's on-chain
  * spend grant decides, whatever the agent proposes.
  *
@@ -18,7 +19,9 @@ export interface Proposal {
   asset: "NEAR";
   amountNear: string;
   reason: string;
-  kind: "scripted";
+  /** "scripted": a fixed payment. "ai": decided by a model on NEAR AI Cloud (server/ai-agent.ts). */
+  kind: "scripted" | "ai";
+  model?: string;
 }
 
 export interface AttemptResult {
