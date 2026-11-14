@@ -44,6 +44,7 @@
     "test": "vitest run",
     "test:live": "LIVE=1 vitest run test/live.test.ts",
     "example:resolve": "tsx examples/resolve.ts",
+    "example:history": "tsx examples/history.ts",
     "example:transfer": "tsx examples/transfer-dry-run.ts",
     "test:coverage": "vitest run --coverage"
   },

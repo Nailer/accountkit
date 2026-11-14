@@ -27,6 +27,8 @@ export {
   ONE_YOCTO,
 } from "./actions.js";
 export type { WalletTransaction, WalletRequest, NearPromise, SpendGrantInput } from "./actions.js";
+export { classifyReceipts, summarizeHistory, fetchReceipts, ownershipArgs, DEFAULT_INDEXER, DEFAULT_ARCHIVAL_RPC } from "./history.js";
+export type { HistoryEvent, TlaHistory, IndexerReceipt } from "./history.js";
 export { NearRpc } from "./rpc.js";
 export { YOCTO_PER_NEAR, parseNear, formatNear } from "./units.js";
 export { AccountKitError, isAccountKitError } from "./errors.js";

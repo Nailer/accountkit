@@ -13,6 +13,7 @@ import type {
 } from "./types.js";
 import { verifyItem, type VerifyResult } from "./verify.js";
 import { rentTx, transferTx, type WalletTransaction } from "./actions.js";
+import { DEFAULT_ARCHIVAL_RPC, DEFAULT_INDEXER, classifyReceipts, fetchReceipts, ownershipArgs, summarizeHistory, type TlaHistory } from "./history.js";
 
 export type NetworkId = "mainnet" | "testnet" | "sandbox" | (string & {});
 
@@ -27,6 +28,10 @@ export interface AccountKitConfig {
   registry?: string;
   /** Chain id expected inside NEP-641 messages. Defaults to the network id. */
   chainId?: string;
+  /** A NearBlocks-v3-compatible indexer for `history()`. Defaults exist for mainnet and testnet. */
+  indexerUrl?: string;
+  /** Archival RPC endpoints, used by `history()` to read old receipts. Defaults exist for mainnet and testnet. */
+  archivalRpcUrls?: string[];
 }
 
 export const DEFAULT_RPC: Record<string, string[]> = {
@@ -57,6 +62,8 @@ export class AccountKit {
   readonly rpc: NearRpc;
   readonly chainId: string;
   private readonly registryHint?: string;
+  private readonly indexerUrl?: string;
+  private readonly archival?: NearRpc;
 
   constructor(config: AccountKitConfig) {
     this.network = config.network;
@@ -65,6 +72,38 @@ export class AccountKit {
     this.rpc = new NearRpc(urls);
     this.chainId = config.chainId ?? (config.network === "sandbox" ? "testnet" : config.network);
     this.registryHint = config.registry ?? (config.network === "mainnet" ? MAINNET_REGISTRY : undefined);
+    this.indexerUrl = config.indexerUrl ?? DEFAULT_INDEXER[config.network];
+    const archival = config.archivalRpcUrls ?? DEFAULT_ARCHIVAL_RPC[config.network];
+    if (archival?.length) this.archival = new NearRpc(archival);
+  }
+
+  /**
+   * The name's history, newest first: who held it, what it paid out, what it
+   * received, and every call its wallet allowed or refused. Reads the account's
+   * receipts from a public indexer (no indexer of your own needed) and the new
+   * owner of each transfer from an archival RPC node. `limit` is the number of
+   * receipts to read (1–100); `complete` is false when older ones exist.
+   */
+  async history(name: string, opts: { limit?: number; ownershipLookups?: number } = {}): Promise<TlaHistory> {
+    const { label, tlaId } = parseTlaName(name);
+    const fullName = `${label}.${tlaId}`;
+    if (!this.indexerUrl) throw new AccountKitError("INDEXER_UNAVAILABLE", `no default indexer for network "${this.network}"; pass indexerUrl`);
+    const limit = Math.max(1, Math.min(100, Math.floor(opts.limit ?? 100)));
+    const rows = await fetchReceipts(this.indexerUrl, fullName, limit);
+    const events = classifyReceipts(fullName, rows);
+    // Name the buyer and seller of the most recent transfers; an unreachable archival node leaves them unnamed.
+    const transfers = events.filter((e) => e.kind === "ownership").slice(0, opts.ownershipLookups ?? 12);
+    await Promise.all(
+      transfers.map(async (e) => {
+        if (e.kind !== "ownership" || !this.archival) return;
+        try {
+          Object.assign(e, ownershipArgs(await this.archival.request("EXPERIMENTAL_receipt", { receipt_id: e.receiptId })));
+        } catch {
+          /* keep the event, without names */
+        }
+      }),
+    );
+    return summarizeHistory(fullName, events, this.indexerUrl, rows.length < limit);
   }
 
   /** The registrar config on a TLA account. Throws NOT_A_TLA if the account is not a House of Stake registrar. */

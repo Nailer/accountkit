@@ -6,6 +6,7 @@ export type AccountKitErrorCode =
   | "LEASE_EXPIRED" // the lease ran out, or the account is parked / frozen
   | "WRONG_OWNER" // the caller is not the current owner
   | "RPC_UNAVAILABLE" // no RPC endpoint answered
+  | "INDEXER_UNAVAILABLE" // the history indexer did not answer or is rate-limiting
   | "CONTRACT_PANIC" // a view or call reached the contract and the contract refused it
   | "AUTH_INVALID" // an NEP-641 authorization did not resolve
   | "INVALID_INPUT"; // an argument would be refused on chain (caught before anything is signed)
